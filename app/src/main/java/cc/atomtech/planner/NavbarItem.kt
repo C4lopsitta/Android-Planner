@@ -1,5 +1,6 @@
 package cc.atomtech.planner
 
+import android.content.Context
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Bento
 import androidx.compose.material.icons.outlined.Dashboard
@@ -16,6 +17,15 @@ data class NavbarItem (
    val route: String
 ) {
    companion object {
+      fun BuildList(context: Context): List<NavbarItem> {
+         return listOf<NavbarItem> (
+            NavbarItem(context.getString(R.string.nav_dashboard_label), Icons.Rounded.Dashboard, Icons.Outlined.Dashboard, "home"),
+            NavbarItem(context.getString(R.string.nav_projects_label), Icons.Rounded.Bento, Icons.Outlined.Bento, "projects"),
+            NavbarItem(context.getString(R.string.nav_labels_label), Icons.Rounded.Tag, Icons.Outlined.Tag, "labels")
+         )
+      }
+
+
       val list = listOf<NavbarItem> (
          NavbarItem("Dashboard", Icons.Rounded.Dashboard, Icons.Outlined.Dashboard, "home"),
          NavbarItem("Projects", Icons.Rounded.Bento, Icons.Outlined.Bento, "projects"),

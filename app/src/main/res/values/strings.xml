@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">Planner</string>
-    <string name="fab_add_descriptor">Add</string>
+    <string name="fab_add_label">Add</string>
+    <string name="nav_dashboard_label">Dashboard</string>
+    <string name="nav_projects_label">Projects</string>
+    <string name="nav_labels_label">Labels</string>
+    <string name="dash_card_reminders_label">Reminders</string>
+    <string name="dash_card_due_soon_label">Due soon</string>
+    <string name="dash_card_important_label">Important</string>
+    <string name="dash_card_shared_with_you_label">Shared with you</string>
 </resources>

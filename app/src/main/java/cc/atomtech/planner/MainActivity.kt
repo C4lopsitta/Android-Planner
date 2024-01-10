@@ -1,15 +1,14 @@
 package cc.atomtech.planner
 
-import android.content.res.Configuration
+import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.twotone.Add
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
@@ -22,7 +21,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.Wallpapers
 import cc.atomtech.planner.ui.theme.PlannerTheme
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -41,19 +39,27 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             // A surface container using the 'background' color from the theme
             Scaffold (
-               bottomBar = { Navbar(navController = navController, navItems = NavbarItem.list) },
+               bottomBar = { Navbar(
+                  navController = navController,
+                  navItems = NavbarItem.BuildList(this)
+               )},
                floatingActionButton = { ExtendedFloatingActionButton(
                   onClick = { fabOnClick() },
-                  text = { Text(text = getString(R.string.fab_add_descriptor)) },
-                  icon = { Icon(Icons.TwoTone.Add, getString(R.string.fab_add_descriptor)) },
+                  text = { Text(text = getString(R.string.fab_add_label)) },
+                  icon = { Icon(Icons.Rounded.Add, getString(R.string.fab_add_label)) },
                   shape = FloatingActionButtonDefaults.extendedFabShape
-               ) },
+               )},
                floatingActionButtonPosition = FabPosition.End,
-               content = { ContentController(navController = navController, paddingValues = it) }
+               content = { ContentController(
+                  navController = navController,
+                  paddingValues = it,
+                  context = this
+               )}
             )
          }
       }
    }
+
 
    private fun fabOnClick() {
       Toast.makeText(this, "Im as useless as my creator!", Toast.LENGTH_SHORT).show()
@@ -70,8 +76,6 @@ fun Navbar(navController: NavHostController, navItems: List<NavbarItem>) {
             label = { Text(text = item.label) },
             onClick = {
                navController.navigate(item.route)
-               Log.i("NAVIGATOR", "Current " + "entry -> $currentNavEntry and equality " +
-                     "returned ${( currentNavEntry.equals(item.route) )}")
             },
             icon = {
                if (currentNavEntry.equals(item.route))
@@ -85,17 +89,18 @@ fun Navbar(navController: NavHostController, navItems: List<NavbarItem>) {
 }
 
 @Composable
-fun ContentController(navController: NavHostController, paddingValues: PaddingValues) {
+fun ContentController(navController: NavHostController, paddingValues: PaddingValues, context: Context?) {
    NavHost(
       navController = navController,
       startDestination = "home",
-      modifier = Modifier.padding(paddingValues = paddingValues),
-      builder = {
-         composable(route = "home") { Dashboard() }
-         composable(route = "labels") { Labels() }
-         composable(route = "projects") { Projects() }
+      modifier = Modifier.padding(paddingValues = paddingValues)
+   ) {
+      composable(route = "home") {
+         Dashboard(context = context)
       }
-   )
+      composable(route = "labels") { Labels() }
+      composable(route = "projects") { Projects() }
+   }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -109,10 +114,10 @@ fun AppPreview() {
       floatingActionButton = { ExtendedFloatingActionButton(
          onClick = {  },
          text = { Text(text = "Add") },
-         icon = { Icon(Icons.TwoTone.Add, "Add") },
+         icon = { Icon(Icons.Rounded.Add, "Add") },
          shape = FloatingActionButtonDefaults.extendedFabShape
       ) },
       floatingActionButtonPosition = FabPosition.End,
-      content = { ContentController(navController = navController, paddingValues = it) }
+      content = { ContentController(navController = navController, paddingValues = it, null) }
    )
 }

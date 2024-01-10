@@ -1,8 +1,8 @@
 package cc.atomtech.planner.ui.pages
 
+import android.content.Context
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,33 +12,42 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Alarm
-import androidx.compose.material.icons.rounded.Explicit
 import androidx.compose.material.icons.rounded.Notifications
+import androidx.compose.material.icons.rounded.People
+import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cc.atomtech.planner.ButtonData
+import cc.atomtech.planner.R
 import cc.atomtech.planner.ui.theme.PlannerTheme
 
-class DashboardCompanion {
-   companion object {
-      val Blocks = listOf<ButtonData>(
-         ButtonData("Reminders", Icons.Rounded.Notifications) {},
-         ButtonData("Due soon", Icons.Rounded.Alarm) {},
-         ButtonData("Forgetters", Icons.Rounded.Explicit) {},
-         ButtonData("Forgetters", Icons.Rounded.Explicit) {}
-      )
-   }
+class DashboardCompanion(context: Context?) {
+   val Blocks = listOf(
+      ButtonData(
+         context?.getString(R.string.dash_card_reminders_label) ?: "Something went real wrong",
+         Icons.Rounded.Notifications) {},
+      ButtonData(
+         context?.getString(R.string.dash_card_due_soon_label) ?: "Something went real wrong",
+         Icons.Rounded.Alarm) {},
+      ButtonData(
+         context?.getString(R.string.dash_card_important_label) ?: "Something went real wrong",
+         Icons.Rounded.Star) {},
+      ButtonData(
+         context?.getString(R.string.dash_card_shared_with_you_label) ?: "Something went real wrong",
+         Icons.Rounded.People) {}
+   )
 }
 
 @Composable
-fun Dashboard() {
+fun Dashboard(context: Context?) {
+   val dashCompanion = DashboardCompanion(context)
+
    Column (
       modifier = Modifier
          .verticalScroll(enabled = true, state = ScrollState(0))
@@ -51,8 +60,8 @@ fun Dashboard() {
          horizontalArrangement = Arrangement.spacedBy(8.dp),
          contentPadding = PaddingValues(12.dp),
          content = {
-         items(count = DashboardCompanion.Blocks.size, key = null) { index ->
-            val buttonData = DashboardCompanion.Blocks[index]
+         items(count = dashCompanion.Blocks.size, key = null) { index ->
+            val buttonData = dashCompanion.Blocks[index]
             IconChip(buttonData = buttonData)
          }
       })
@@ -77,6 +86,6 @@ fun IconChip(buttonData: ButtonData) {
 @Composable
 fun DashboardPreview() {
    PlannerTheme {
-      Dashboard()
+      Dashboard(null)
    }
 }
