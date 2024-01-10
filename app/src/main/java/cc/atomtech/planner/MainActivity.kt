@@ -2,6 +2,7 @@ package cc.atomtech.planner
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -21,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import cc.atomtech.planner.ui.theme.PlannerTheme
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -72,10 +74,16 @@ fun Navbar(navController: NavHostController, navItems: List<NavbarItem>) {
       val currentNavEntry: String? = navController.currentBackStackEntry?.destination?.route
       navItems.forEach { item ->
          NavigationBarItem(
-            selected = ( currentNavEntry.equals(item.route) ), //TODO: Add selection detection
+            selected = ( currentNavEntry.equals(item.route) ),
             label = { Text(text = item.label) },
+            alwaysShowLabel = false,
             onClick = {
-               navController.navigate(item.route)
+               navController.navigate(item.route) {
+                  popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                  launchSingleTop = true
+                  restoreState = true
+                  Log.i("Navigator", "I've  been selected! $currentNavEntry -> ${item.route}")
+               }
             },
             icon = {
                if (currentNavEntry.equals(item.route))
@@ -93,14 +101,19 @@ fun ContentController(navController: NavHostController, paddingValues: PaddingVa
    NavHost(
       navController = navController,
       startDestination = "home",
-      modifier = Modifier.padding(paddingValues = paddingValues)
-   ) {
-      composable(route = "home") {
-         Dashboard(context = context)
+      modifier = Modifier.padding(paddingValues = paddingValues),
+      builder = {
+         composable(route = "home") {
+            Dashboard(context = context)
+         }
+         composable(route = "labels") {
+            Labels()
+         }
+         composable(route = "projects") {
+            Projects()
+         }
       }
-      composable(route = "labels") { Labels() }
-      composable(route = "projects") { Projects() }
-   }
+   )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

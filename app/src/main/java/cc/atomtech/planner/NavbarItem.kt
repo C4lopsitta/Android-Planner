@@ -19,8 +19,8 @@ data class NavbarItem (
    companion object {
       fun BuildList(context: Context): List<NavbarItem> {
          return listOf<NavbarItem> (
-            NavbarItem(context.getString(R.string.nav_dashboard_label), Icons.Rounded.Dashboard, Icons.Outlined.Dashboard, "home"),
             NavbarItem(context.getString(R.string.nav_projects_label), Icons.Rounded.Bento, Icons.Outlined.Bento, "projects"),
+            NavbarItem(context.getString(R.string.nav_dashboard_label), Icons.Rounded.Dashboard, Icons.Outlined.Dashboard, "home"),
             NavbarItem(context.getString(R.string.nav_labels_label), Icons.Rounded.Tag, Icons.Outlined.Tag, "labels")
          )
       }
