@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Planner</string>
+    <string name="fab_add_descriptor">Add</string>
+</resources>
