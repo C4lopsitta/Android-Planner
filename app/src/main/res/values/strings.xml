@@ -8,4 +8,6 @@
     <string name="dash_card_due_soon_label">Due soon</string>
     <string name="dash_card_important_label">Important</string>
     <string name="dash_card_shared_with_you_label">Shared with you</string>
+    <string name="btn_settings_desc">Settings</string>
+    <string name="btn_search_desc">Search</string>
 </resources>
