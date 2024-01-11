@@ -10,4 +10,6 @@
     <string name="dash_card_shared_with_you_label">Shared with you</string>
     <string name="btn_settings_desc">Settings</string>
     <string name="btn_search_desc">Search</string>
+    <string name="activity_settings">Settings</string>
+    <string name="btn_back_desc">Back</string>
 </resources>

@@ -1,17 +1,16 @@
 package cc.atomtech.planner.ui.pages
 
 import android.content.Context
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Alarm
 import androidx.compose.material.icons.rounded.CreditCard
@@ -62,7 +61,8 @@ fun Dashboard(context: Context?) {
    ) {
       LazyVerticalGrid(
          columns = GridCells.Fixed(2),
-         modifier = Modifier.height(180.dp),
+         modifier = Modifier
+            .requiredHeight(200.dp),
          verticalArrangement = Arrangement.spacedBy(8.dp),
          horizontalArrangement = Arrangement.spacedBy(8.dp),
          contentPadding = PaddingValues(12.dp),

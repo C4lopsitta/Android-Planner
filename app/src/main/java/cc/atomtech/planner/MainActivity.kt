@@ -1,6 +1,7 @@
 package cc.atomtech.planner
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -25,18 +26,26 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import cc.atomtech.planner.ui.theme.PlannerTheme
 import androidx.navigation.NavHostController
+import androidx.navigation.activity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -44,67 +53,47 @@ import cc.atomtech.planner.dataEntities.NavbarItem
 import cc.atomtech.planner.ui.pages.Dashboard
 import cc.atomtech.planner.ui.pages.Labels
 import cc.atomtech.planner.ui.pages.Projects
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "preferences")
 
 class MainActivity : ComponentActivity() {
-   @OptIn(ExperimentalMaterial3Api::class)
+   @OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
    override fun onCreate(savedInstanceState: Bundle?) {
+      var useSearchTopBar: Boolean = false;
+      GlobalScope.launch { useSearchTopBar = AppPreferences.readBoolean(this@MainActivity, "useSearchTopBar") }
+
       super.onCreate(savedInstanceState)
       setContent {
          PlannerTheme {
             val navController = rememberNavController()
-            val searchQuery = remember { mutableStateOf("") }
-            val isSearchExpanded = remember { mutableStateOf(false) }
+            val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
             // A surface container using the 'background' color from the theme
             Scaffold (
                topBar = {
-                  Box(
-                     modifier = Modifier
-                        .padding(top = 12.dp)
-                        .padding(horizontal = 12.dp)
-                        .fillMaxWidth(),
-                     contentAlignment = Alignment.Center,
-                  ) {
-                     DockedSearchBar(
-                        query = searchQuery.value,
-                        placeholder = {
-                           Text(
-                              text = getString(R.string.app_name),
-                              fontSize = TextUnit(4F, TextUnitType.Em)
-                           )
+                  if(useSearchTopBar)
+                     SearchBar(context = this@MainActivity)
+                  else
+                     CenterAlignedTopAppBar(
+                        title = {
+                           Text(text = getString(R.string.app_name), maxLines = 1, overflow = TextOverflow.Ellipsis)
                         },
-                        onQueryChange = {
-                           searchQuery.value = it
-                        },
-                        onSearch = {
-                           Toast.makeText(this@MainActivity, "Searchin'", Toast.LENGTH_SHORT).show()
-                        },
-                        active = isSearchExpanded.value,
-                        onActiveChange = {
-                           isSearchExpanded.value = it
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        leadingIcon = {
-                           IconButton(onClick = { /*TODO*/ }) {
-                              Icon(
-                                 imageVector = Icons.Rounded.Search,
-                                 contentDescription = getString(R.string.btn_search_desc)
-                              )
+                        actions = {
+                           IconButton(onClick = {
+                              navController.navigate("settings") {
+                                 popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                                 launchSingleTop = true
+                                 restoreState = true
+                              }
+                              startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
+                           }) {
+                              Icon(imageVector = Icons.Rounded.Settings, contentDescription = getString(R.string.btn_settings_desc))
                            }
                         },
-                        trailingIcon = {
-                           IconButton(onClick = { }) {
-                              Icon(
-                                 imageVector = Icons.Rounded.Settings,
-                                 contentDescription = getString(R.string.btn_settings_desc)
-                              )
-                           }
-                        },
-                        content = {
-                           Text(text = "Not much to see here for now")
-                        },
-                        tonalElevation = 6.dp
+                        scrollBehavior = scrollBehavior
                      )
-                  }
                },
                bottomBar = { Navbar(
                   navController = navController,
@@ -147,7 +136,6 @@ fun Navbar(navController: NavHostController, navItems: List<NavbarItem>) {
                   popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                   launchSingleTop = true
                   restoreState = true
-                  Log.i("Navigator", "I've  been selected! $currentNavEntry -> ${item.route}")
                }
             },
             icon = {
@@ -177,9 +165,71 @@ fun ContentController(navController: NavHostController, paddingValues: PaddingVa
          composable(route = "projects") {
             Projects()
          }
+         composable(route = "settings") {
+            SettingsActivity::class.java
+         }
       }
    )
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchBar(context: Context) {
+   val searchQuery = remember { mutableStateOf("") }
+   val isSearchExpanded = remember { mutableStateOf(false) }
+
+   Box(
+      modifier = Modifier
+         .padding(top = 12.dp)
+         .padding(horizontal = 12.dp)
+         .fillMaxWidth(),
+      contentAlignment = Alignment.Center,
+   ) {
+      DockedSearchBar(
+         query = searchQuery.value,
+         placeholder = {
+            Text(
+               text = context.getString(R.string.app_name),
+               fontSize = TextUnit(4F, TextUnitType.Em)
+            )
+         },
+         onQueryChange = {
+            searchQuery.value = it
+         },
+         onSearch = {
+
+         },
+         active = isSearchExpanded.value,
+         onActiveChange = {
+            isSearchExpanded.value = it
+         },
+         modifier = Modifier.fillMaxWidth(),
+         leadingIcon = {
+            IconButton(onClick = { /*TODO*/ }) {
+               Icon(
+                  imageVector = Icons.Rounded.Search,
+                  contentDescription = context.getString(R.string.btn_search_desc)
+               )
+            }
+         },
+         trailingIcon = {
+            IconButton(onClick = {
+               GlobalScope.launch { AppPreferences.writeBoolean(context, "useSearchTopBar", false) }
+            }) {
+               Icon(
+                  imageVector = Icons.Rounded.Settings,
+                  contentDescription = context.getString(R.string.btn_settings_desc)
+               )
+            }
+         },
+         content = {
+            Text(text = "Not much to see here for now")
+         },
+         tonalElevation = 6.dp
+      )
+   }
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true, showSystemUi = true, backgroundColor = 0xFF000000)
