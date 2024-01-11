@@ -63,7 +63,7 @@ dependencies {
 
    // navigation dependencies
    implementation("androidx.navigation:navigation-compose:2.7.6")
-   // extended material icons, needs minimify to avoid big App sizes
+   // extended material icons, needs minify to avoid big App sizes
    implementation("androidx.compose.material:material-icons-extended")
 
    //room db plus KSP processor

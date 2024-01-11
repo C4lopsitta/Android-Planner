@@ -75,7 +75,7 @@ fun Navbar(navController: NavHostController, navItems: List<NavbarItem>) {
       val currentNavEntry: String = navController.currentBackStackEntry?.destination?.route ?: "home"
       navItems.forEach { item ->
          NavigationBarItem(
-            selected = ( currentNavEntry.equals(item.route) ),
+            selected = (currentNavEntry == item.route),
             label = { Text(text = item.label) },
             alwaysShowLabel = false,
             onClick = {
@@ -87,7 +87,7 @@ fun Navbar(navController: NavHostController, navItems: List<NavbarItem>) {
                }
             },
             icon = {
-               if (currentNavEntry.equals(item.route))
+               if (currentNavEntry == item.route)
                   Icon(item.icon, item.label)
                else
                   Icon(item.unselectedIcon, item.label)
