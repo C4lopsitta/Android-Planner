@@ -3,7 +3,6 @@ package cc.atomtech.planner
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -45,7 +44,6 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import cc.atomtech.planner.ui.theme.PlannerTheme
 import androidx.navigation.NavHostController
-import androidx.navigation.activity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -62,7 +60,7 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "pr
 class MainActivity : ComponentActivity() {
    @OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
    override fun onCreate(savedInstanceState: Bundle?) {
-      var useSearchTopBar: Boolean = false;
+      var useSearchTopBar = false
       GlobalScope.launch { useSearchTopBar = AppPreferences.readBoolean(this@MainActivity, "useSearchTopBar") }
 
       super.onCreate(savedInstanceState)
@@ -77,20 +75,11 @@ class MainActivity : ComponentActivity() {
                      SearchBar(context = this@MainActivity)
                   else
                      CenterAlignedTopAppBar(
-                        title = {
-                           Text(text = getString(R.string.app_name), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        },
+                        title = { Text(text = getString(R.string.app_name), maxLines = 1, overflow = TextOverflow.Ellipsis) },
                         actions = {
                            IconButton(onClick = {
-                              navController.navigate("settings") {
-                                 popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                 launchSingleTop = true
-                                 restoreState = true
-                              }
                               startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
-                           }) {
-                              Icon(imageVector = Icons.Rounded.Settings, contentDescription = getString(R.string.btn_settings_desc))
-                           }
+                           }) { Icon(imageVector = Icons.Rounded.Settings, contentDescription = getString(R.string.btn_settings_desc)) }
                         },
                         scrollBehavior = scrollBehavior
                      )
@@ -172,7 +161,7 @@ fun ContentController(navController: NavHostController, paddingValues: PaddingVa
    )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
 @Composable
 fun SearchBar(context: Context) {
    val searchQuery = remember { mutableStateOf("") }
