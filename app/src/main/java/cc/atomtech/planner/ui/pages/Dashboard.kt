@@ -26,7 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import cc.atomtech.planner.ButtonData
+import cc.atomtech.planner.dataEntities.ButtonData
 import cc.atomtech.planner.R
 import cc.atomtech.planner.ui.theme.PlannerTheme
 

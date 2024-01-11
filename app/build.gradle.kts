@@ -1,6 +1,7 @@
 plugins {
    id("com.android.application")
    id("org.jetbrains.kotlin.android")
+   id("com.google.devtools.ksp")
 }
 
 android {
@@ -9,7 +10,7 @@ android {
 
    defaultConfig {
       applicationId = "cc.atomtech.planner"
-      minSdk = 28
+      minSdk = 26
       targetSdk = 34
       versionCode = 1
       versionName = "0.1"
@@ -22,7 +23,7 @@ android {
 
    buildTypes {
       release {
-         isMinifyEnabled = false
+         isMinifyEnabled = true
          proguardFiles(
             getDefaultProguardFile("proguard-android-optimize.txt"),
             "proguard-rules.pro"
@@ -30,11 +31,11 @@ android {
       }
    }
    compileOptions {
-      sourceCompatibility = JavaVersion.VERSION_1_8
-      targetCompatibility = JavaVersion.VERSION_1_8
+      sourceCompatibility = JavaVersion.VERSION_17
+      targetCompatibility = JavaVersion.VERSION_17
    }
    kotlinOptions {
-      jvmTarget = "1.8"
+      jvmTarget = "17"
    }
    buildFeatures {
       compose = true
@@ -60,9 +61,17 @@ dependencies {
    implementation("androidx.compose.ui:ui-tooling-preview")
    implementation("androidx.compose.material3:material3")
 
+   // navigation dependencies
    implementation("androidx.navigation:navigation-compose:2.7.6")
-
+   // extended material icons, needs minimify to avoid big App sizes
    implementation("androidx.compose.material:material-icons-extended")
+
+   //room db plus KSP processor
+   implementation("androidx.room:room-runtime:2.6.1")
+   annotationProcessor("androidx.room:room-compiler:2.6.1")
+   implementation("androidx.room:room-ktx:2.6.1")
+
+   ksp("androidx.room:room-compiler:2.6.1")
 
    testImplementation("junit:junit:4.13.2")
    androidTestImplementation("androidx.test.ext:junit:1.1.5")

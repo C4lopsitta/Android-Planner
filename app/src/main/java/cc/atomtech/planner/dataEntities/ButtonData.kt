@@ -1,4 +1,4 @@
-package cc.atomtech.planner
+package cc.atomtech.planner.dataEntities
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

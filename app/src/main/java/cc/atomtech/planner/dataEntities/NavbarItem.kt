@@ -1,4 +1,4 @@
-package cc.atomtech.planner
+package cc.atomtech.planner.dataEntities
 
 import android.content.Context
 import androidx.compose.material.icons.Icons
@@ -9,6 +9,7 @@ import androidx.compose.material.icons.rounded.Bento
 import androidx.compose.material.icons.rounded.Dashboard
 import androidx.compose.material.icons.rounded.Tag
 import androidx.compose.ui.graphics.vector.ImageVector
+import cc.atomtech.planner.R
 
 data class NavbarItem (
    val label: String,
