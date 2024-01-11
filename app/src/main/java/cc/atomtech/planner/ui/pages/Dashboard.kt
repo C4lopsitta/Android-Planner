@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.verticalScroll
@@ -28,7 +29,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cc.atomtech.planner.dataEntities.ButtonData
 import cc.atomtech.planner.R
+import cc.atomtech.planner.dataEntities.Reminder
+import cc.atomtech.planner.dataEntities.ReminderRow
 import cc.atomtech.planner.ui.theme.PlannerTheme
+import java.sql.Time
+import java.time.Instant
 
 class DashboardCompanion(context: Context?) {
    val Blocks = listOf(
@@ -53,7 +58,6 @@ fun Dashboard(context: Context?) {
 
    Column (
       modifier = Modifier
-         .verticalScroll(enabled = true, state = ScrollState(0))
          .fillMaxSize()
    ) {
       LazyVerticalGrid(
@@ -68,6 +72,19 @@ fun Dashboard(context: Context?) {
             IconCard(buttonData = buttonData)
          }
       })
+      LazyColumn(
+         verticalArrangement = Arrangement.spacedBy(8.dp),
+         contentPadding = PaddingValues(12.dp),
+         content = {
+            items(count = 1, key = null) {
+               ReminderRow(context = context, reminder = Reminder())
+               ReminderRow(
+                  context = context,
+                  reminder =
+                     Reminder(isCompleted = true, notificationDate = Time.from(Instant.now()).time)
+               )
+            }
+         })
    }
 }
 
