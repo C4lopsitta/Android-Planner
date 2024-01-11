@@ -71,7 +71,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Navbar(navController: NavHostController, navItems: List<NavbarItem>) {
    NavigationBar() {
-      val currentNavEntry: String? = navController.currentBackStackEntry?.destination?.route
+      val currentNavEntry: String = navController.currentBackStackEntry?.destination?.route ?: "home"
       navItems.forEach { item ->
          NavigationBarItem(
             selected = ( currentNavEntry.equals(item.route) ),

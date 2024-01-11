@@ -7,15 +7,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Alarm
+import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.People
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -30,16 +33,16 @@ import cc.atomtech.planner.ui.theme.PlannerTheme
 class DashboardCompanion(context: Context?) {
    val Blocks = listOf(
       ButtonData(
-         context?.getString(R.string.dash_card_reminders_label) ?: "Something went real wrong",
+         context?.getString(R.string.dash_card_reminders_label) ?: "HC - Reminders",
          Icons.Rounded.Notifications) {},
       ButtonData(
-         context?.getString(R.string.dash_card_due_soon_label) ?: "Something went real wrong",
+         context?.getString(R.string.dash_card_due_soon_label) ?: "HC - Due soon",
          Icons.Rounded.Alarm) {},
       ButtonData(
-         context?.getString(R.string.dash_card_important_label) ?: "Something went real wrong",
+         context?.getString(R.string.dash_card_important_label) ?: "HC - Important",
          Icons.Rounded.Star) {},
       ButtonData(
-         context?.getString(R.string.dash_card_shared_with_you_label) ?: "Something went real wrong",
+         context?.getString(R.string.dash_card_shared_with_you_label) ?: "HC - Shared with u",
          Icons.Rounded.People) {}
    )
 }
@@ -62,7 +65,7 @@ fun Dashboard(context: Context?) {
          content = {
          items(count = dashCompanion.Blocks.size, key = null) { index ->
             val buttonData = dashCompanion.Blocks[index]
-            IconChip(buttonData = buttonData)
+            IconCard(buttonData = buttonData)
          }
       })
    }
@@ -70,15 +73,23 @@ fun Dashboard(context: Context?) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IconChip(buttonData: ButtonData) {
+fun IconCard(buttonData: ButtonData) {
    Card(
       onClick = buttonData.onClick,
       modifier = Modifier
-         .height(80.dp)
+         .height(80.dp),
+      elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
    ) {
-      buttonData.icon
-         ?.let{Icon( imageVector = it, contentDescription = buttonData.label) }
-      Text(text = buttonData.label)
+      Column(
+         verticalArrangement = Arrangement.Bottom,
+         modifier = Modifier
+            .fillMaxSize()
+            .padding(12.dp)
+      ) {
+         buttonData.icon
+            ?.let{Icon( imageVector = it, contentDescription = buttonData.label) }
+         Text(text = buttonData.label)
+      }
    }
 }
 
@@ -87,5 +98,13 @@ fun IconChip(buttonData: ButtonData) {
 fun DashboardPreview() {
    PlannerTheme {
       Dashboard(null)
+   }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun IconCardPreview() {
+   PlannerTheme {
+      IconCard(buttonData = ButtonData("What a card", Icons.Rounded.CreditCard) {})
    }
 }
