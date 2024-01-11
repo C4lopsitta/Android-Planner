@@ -3,7 +3,6 @@ package cc.atomtech.planner
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
@@ -63,6 +62,8 @@ class MainActivity : ComponentActivity() {
       var useSearchTopBar = false
       GlobalScope.launch { useSearchTopBar = AppPreferences.readBoolean(this@MainActivity, "useSearchTopBar") }
 
+      DB.Connect(this)
+
       super.onCreate(savedInstanceState)
       setContent {
          PlannerTheme {
@@ -105,9 +106,8 @@ class MainActivity : ComponentActivity() {
       }
    }
 
-
    private fun fabOnClick() {
-      Toast.makeText(this, "Im as useless as my creator!", Toast.LENGTH_SHORT).show()
+      startActivity(Intent(this@MainActivity, CreateActivity::class.java))
    }
 }
 

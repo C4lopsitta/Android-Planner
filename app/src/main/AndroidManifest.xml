@@ -27,6 +27,11 @@
             android:name=".SettingsActivity"
             android:theme="@style/Theme.Planner"
             android:label="@string/btn_search_desc"/>
+
+        <activity
+            android:name=".CreateActivity"
+            android:theme="@style/Theme.Planner"
+            android:label="@string/activity_create"/>
     </application>
 
 </manifest>

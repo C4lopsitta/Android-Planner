@@ -1,13 +1,10 @@
 package cc.atomtech.planner.dataEntities
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CardDefaults
@@ -29,6 +26,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import cc.atomtech.planner.DB
 import cc.atomtech.planner.ui.theme.PlannerTheme
 import java.sql.Time
 import java.time.Instant
@@ -61,6 +59,10 @@ data class Reminder (
    fun updateCompletionStatus() {
       this.isCompleted = !this.isCompleted
       // TODO: Do database update
+   }
+
+   fun store() {
+      DB.getRemindersDAO()?.create(this)
    }
 
    fun getBriefTitle() {
