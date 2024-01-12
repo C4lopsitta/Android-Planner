@@ -28,6 +28,9 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import cc.atomtech.planner.DB
 import cc.atomtech.planner.ui.theme.PlannerTheme
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.sql.Time
 import java.time.Instant
 
@@ -49,20 +52,21 @@ data class Reminder (
    @ColumnInfo()                    var notifies: Boolean = false,
    @ColumnInfo()                    var labels: ArrayList<String> = ArrayList(),
    @ColumnInfo()                    var appertainsTo: String? = null,
-   @ColumnInfo()                    var projectIdentifier: Long? = null
+   @ColumnInfo()                    var projectIdentifier: Long? = -1
 ) {
    fun isLate(): Boolean {
       val now: Long = Time.from(Instant.now()).time
       return (notificationDate ?: 0) < now
    }
 
+   @OptIn(DelicateCoroutinesApi::class)
    fun updateCompletionStatus() {
       this.isCompleted = !this.isCompleted
-      // TODO: Do database update
+      GlobalScope.launch { DB.getRemindersDAO()!!.update(this@Reminder) }
    }
 
    fun store() {
-      DB.getRemindersDAO()?.create(this)
+      GlobalScope.launch { DB.getRemindersDAO()?.create(this@Reminder) }
    }
 
    fun getBriefTitle() {
@@ -124,7 +128,7 @@ fun ReminderRow(context: Context?, reminder: Reminder) {
 @Preview(showBackground = true)
 @Composable
 fun ReminderRowPreview() {
-   var reminder = Reminder(isCompleted = true, notificationDate = Time.from(Instant.now()).time)
+   val reminder = Reminder(isCompleted = true, notificationDate = Time.from(Instant.now()).time)
    PlannerTheme {
       ReminderRow(context = null, reminder = reminder)
    }

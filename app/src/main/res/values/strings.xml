@@ -16,4 +16,5 @@
     <string name="word_reminder">Reminder</string>
     <string name="txt_reminder_title">Title</string>
     <string name="fab_save_label">Save</string>
+    <string name="lbl_recieve_notification">Receive a Notification</string>
 </resources>

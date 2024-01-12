@@ -35,7 +35,7 @@ import java.sql.Time
 import java.time.Instant
 
 class DashboardCompanion(context: Context?) {
-   val Blocks = listOf(
+   val blocks = listOf(
       ButtonData(
          context?.getString(R.string.dash_card_reminders_label) ?: "HC - Reminders",
          Icons.Rounded.Notifications) {},
@@ -67,8 +67,8 @@ fun Dashboard(context: Context?) {
          horizontalArrangement = Arrangement.spacedBy(8.dp),
          contentPadding = PaddingValues(12.dp),
          content = {
-         items(count = dashCompanion.Blocks.size, key = null) { index ->
-            val buttonData = dashCompanion.Blocks[index]
+         items(count = dashCompanion.blocks.size, key = null) { index ->
+            val buttonData = dashCompanion.blocks[index]
             IconCard(buttonData = buttonData)
          }
       })
