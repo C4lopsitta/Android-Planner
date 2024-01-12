@@ -36,11 +36,11 @@ import java.time.Instant
 
 @Entity(
    tableName = "reminders",
-   foreignKeys = [ForeignKey(
-      entity = Project::class,
-      parentColumns = arrayOf("rowid"),
-      childColumns = arrayOf("projectIdentifier")
-   )]
+   //foreignKeys = [ForeignKey(
+   //   entity = Project::class,
+   //   parentColumns = arrayOf("rowid"),
+   //   childColumns = arrayOf("projectIdentifier")
+   //)]
 )
 data class Reminder (
    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "rowid") val id: Long = -1,

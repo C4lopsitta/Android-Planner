@@ -9,6 +9,10 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "projects")
 data class Project(
    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "rowid") var id: Long,
+   @ColumnInfo()                    var name: String,
+   @ColumnInfo()                    var color: String,
+   @ColumnInfo()                    var isImportant: Boolean
 ) {
 
 }
+

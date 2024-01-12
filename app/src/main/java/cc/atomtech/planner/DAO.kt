@@ -54,9 +54,16 @@ class DB() {
    companion object {
       var db: RoomDatabase? = null
 
-      fun Connect(context: Context) {
+      fun Connect(context: Context, allowDestructiveMigration: Boolean = false) {
          if(db != null)
             return
+         if(allowDestructiveMigration) {
+            db = Room.databaseBuilder(context, DAO::class.java, "planner_db")
+               .fallbackToDestructiveMigration()
+               .fallbackToDestructiveMigrationOnDowngrade()
+               .build()
+            return
+         }
          db = Room.databaseBuilder(context, DAO::class.java, "planner_db")
             .build()
       }

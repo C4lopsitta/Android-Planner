@@ -3,6 +3,7 @@ package cc.atomtech.planner
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
@@ -46,6 +47,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import cc.atomtech.planner.dataEntities.NavbarItem
+import cc.atomtech.planner.dataEntities.Reminder
 import cc.atomtech.planner.ui.pages.Dashboard
 import cc.atomtech.planner.ui.pages.Labels
 import cc.atomtech.planner.ui.pages.Projects
@@ -57,18 +59,32 @@ import kotlinx.coroutines.launch
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "preferences")
 
 class MainActivity : ComponentActivity() {
+
    @OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
    override fun onCreate(savedInstanceState: Bundle?) {
       var useSearchTopBar = false
       GlobalScope.launch { useSearchTopBar = AppPreferences.readBoolean(this@MainActivity, "useSearchTopBar") }
 
-      DB.Connect(this)
+      DB.Connect(context = this@MainActivity, allowDestructiveMigration = false)
+      var reminders: MutableList<Reminder>? = null
+
+      GlobalScope.launch {
+         reminders = (DB.getRemindersDAO()?.readAll())?.toMutableList()
+         Log.i("REMINDER DUMP", "--- begin dump ---")
+         reminders?.forEach {
+            Log.i("REMINDER", it.toString())
+         }
+         Log.i("REMINDER DUMP", "--- end dump ---")
+      }
 
       super.onCreate(savedInstanceState)
       setContent {
          PlannerTheme {
             val navController = rememberNavController()
             val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+
+            val mutableReminders = remember { reminders }
+
             // A surface container using the 'background' color from the theme
             Scaffold (
                topBar = {
