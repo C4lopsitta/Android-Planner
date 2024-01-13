@@ -52,7 +52,7 @@ abstract class DAO: RoomDatabase() {
 
 class DB() {
    companion object {
-      var db: RoomDatabase? = null
+      private var db: RoomDatabase? = null
 
       fun Connect(context: Context, allowDestructiveMigration: Boolean = false) {
          if(db != null)

@@ -42,11 +42,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import cc.atomtech.planner.dataEntities.Reminder
 import cc.atomtech.planner.ui.theme.PlannerTheme
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
-class CreateActivity : ComponentActivity() {
-   val reminder = Reminder()
+class EditorActivity : ComponentActivity() {
+   var isCreator: Boolean = false
+   private lateinit var reminder: Reminder
    @OptIn(ExperimentalMaterial3Api::class)
    override fun onCreate(savedInstanceState: Bundle?) {
+      val superIntent = intent
+      isCreator = superIntent.getBooleanExtra("isCreator", true)
+
+      //if we are not creating a reminder, we're editing one, so let's read it from the DB
+      if(!isCreator)
+         GlobalScope.launch {
+            reminder = DB.getRemindersDAO()
+               ?.read(superIntent.getLongExtra("rowid", 0)) ?: Reminder()
+         }
+      else
+         reminder = Reminder()
+
       super.onCreate(savedInstanceState)
 
       setContent {
@@ -59,13 +74,16 @@ class CreateActivity : ComponentActivity() {
                   CenterAlignedTopAppBar(
                      title = {
                         Text(
-                           text = "${getString(R.string.activity_create)} ${getString(R.string.word_reminder)}"
+                           text = "${
+                              if(isCreator) getString(R.string.activity_create)
+                              else getString(R.string.activity_editor)
+                           } ${getString(R.string.word_reminder)}"
                         )
                      },
                      scrollBehavior = scrollBehavior,
                      navigationIcon = {
                         IconButton(onClick = {
-                           navigateUpTo(Intent(this@CreateActivity, MainActivity::class.java))
+                           navigateUpTo(Intent(this@EditorActivity, MainActivity::class.java))
                         }) {
                            Icon(
                               imageVector = Icons.Rounded.ArrowBack,
@@ -88,7 +106,7 @@ class CreateActivity : ComponentActivity() {
                   )
                },
                content = {
-                  CreateColumn(this@CreateActivity, it, reminder)
+                  CreateColumn(this@EditorActivity, it, reminder)
                }
             )
          }
@@ -98,7 +116,7 @@ class CreateActivity : ComponentActivity() {
 
 @Composable
 fun CreateColumn(context: Context?, paddingValues: PaddingValues, reminder: Reminder) {
-   val title = remember { mutableStateOf("") }
+   val title = remember { mutableStateOf(reminder.title) }
    val notifies = remember { mutableStateOf(false) }
 
    Column (

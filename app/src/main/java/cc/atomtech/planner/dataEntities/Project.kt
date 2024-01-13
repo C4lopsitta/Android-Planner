@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 @Fts4
 @Entity(tableName = "projects")
 data class Project(
-   @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "rowid") var id: Long,
+   @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "rowid") var id: Long? = null,
    @ColumnInfo()                    var name: String,
    @ColumnInfo()                    var color: String,
    @ColumnInfo()                    var isImportant: Boolean

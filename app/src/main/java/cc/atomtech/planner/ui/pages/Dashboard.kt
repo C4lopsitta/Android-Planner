@@ -31,8 +31,6 @@ import cc.atomtech.planner.R
 import cc.atomtech.planner.dataEntities.Reminder
 import cc.atomtech.planner.dataEntities.ReminderRow
 import cc.atomtech.planner.ui.theme.PlannerTheme
-import java.sql.Time
-import java.time.Instant
 
 class DashboardCompanion(context: Context?) {
    val blocks = listOf(
@@ -52,7 +50,8 @@ class DashboardCompanion(context: Context?) {
 }
 
 @Composable
-fun Dashboard(context: Context?) {
+fun Dashboard(context: Context?,
+              reminders: MutableList<Reminder>?) {
    val dashCompanion = DashboardCompanion(context)
 
    Column (
@@ -76,13 +75,9 @@ fun Dashboard(context: Context?) {
          verticalArrangement = Arrangement.spacedBy(8.dp),
          contentPadding = PaddingValues(12.dp),
          content = {
-            items(count = 1, key = null) {
-               ReminderRow(context = context, reminder = Reminder())
-               ReminderRow(
-                  context = context,
-                  reminder =
-                     Reminder(isCompleted = true, notificationDate = Time.from(Instant.now()).time)
-               )
+            items(count = reminders?.size ?: 0, key = null) {
+               val item = reminders?.get(it) ?: Reminder()
+               ReminderRow(context = context, reminder = item)
             }
          })
    }
@@ -114,7 +109,7 @@ fun IconCard(buttonData: ButtonData) {
 @Composable
 fun DashboardPreview() {
    PlannerTheme {
-      Dashboard(null)
+      Dashboard(null, null)
    }
 }
 

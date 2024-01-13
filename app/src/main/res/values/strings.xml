@@ -17,4 +17,5 @@
     <string name="txt_reminder_title">Title</string>
     <string name="fab_save_label">Save</string>
     <string name="lbl_recieve_notification">Receive a Notification</string>
+    <string name="activity_editor">Edit</string>
 </resources>

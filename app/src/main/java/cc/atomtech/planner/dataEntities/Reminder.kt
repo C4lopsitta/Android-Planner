@@ -1,6 +1,7 @@
 package cc.atomtech.planner.dataEntities
 
 import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,6 +28,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import cc.atomtech.planner.DB
+import cc.atomtech.planner.EditorActivity
 import cc.atomtech.planner.ui.theme.PlannerTheme
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -43,8 +45,8 @@ import java.time.Instant
    //)]
 )
 data class Reminder (
-   @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "rowid") val id: Long = -1,
-   @ColumnInfo()                    var title: String = "What a reminder",
+   @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "rowid") val id: Long? = null,
+   @ColumnInfo()                    var title: String = "",
    @ColumnInfo()                    var isCompleted: Boolean = false,
    @ColumnInfo()                    var creationDate: Long = Time.from(Instant.now()).time,
    @ColumnInfo()                    var completionDate: Long? = null,
@@ -93,7 +95,12 @@ data class Reminder (
 @Composable
 fun ReminderRow(context: Context?, reminder: Reminder) {
    OutlinedCard(
-      onClick = { /* TODO: Implement opener */ },
+      onClick = {
+         val intent = Intent(context, EditorActivity::class.java)
+            .putExtra("isCreator", false)
+            .putExtra("rowid", reminder.id)
+         context?.startActivity(intent)
+      },
       modifier = Modifier
          .fillMaxWidth(),
       shape = CardDefaults.outlinedShape,

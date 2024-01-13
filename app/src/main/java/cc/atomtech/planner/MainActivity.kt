@@ -115,7 +115,9 @@ class MainActivity : ComponentActivity() {
                content = { ContentController(
                   navController = navController,
                   paddingValues = it,
-                  context = this
+                  context = this,
+                  reminders = reminders,
+                  mutableReminders = mutableReminders
                )}
             )
          }
@@ -123,7 +125,9 @@ class MainActivity : ComponentActivity() {
    }
 
    private fun fabOnClick() {
-      startActivity(Intent(this@MainActivity, CreateActivity::class.java))
+      startActivity(
+         Intent(this@MainActivity, EditorActivity::class.java).putExtra("isCreator", true)
+      )
    }
 }
 
@@ -155,23 +159,24 @@ fun Navbar(navController: NavHostController, navItems: List<NavbarItem>) {
 }
 
 @Composable
-fun ContentController(navController: NavHostController, paddingValues: PaddingValues, context: Context?) {
+fun ContentController(navController: NavHostController,
+                      reminders: MutableList<Reminder>?,
+                      mutableReminders: MutableList<Reminder>?,
+                      paddingValues: PaddingValues,
+                      context: Context?) {
    NavHost(
       navController = navController,
       startDestination = "home",
       modifier = Modifier.padding(paddingValues = paddingValues),
       builder = {
          composable(route = "home") {
-            Dashboard(context = context)
+            Dashboard(context = context, reminders = mutableReminders)
          }
          composable(route = "labels") {
             Labels()
          }
          composable(route = "projects") {
             Projects()
-         }
-         composable(route = "settings") {
-            SettingsActivity::class.java
          }
       }
    )
@@ -251,6 +256,12 @@ fun AppPreview() {
          shape = FloatingActionButtonDefaults.extendedFabShape
       ) },
       floatingActionButtonPosition = FabPosition.End,
-      content = { ContentController(navController = navController, paddingValues = it, null) }
+      content = { ContentController(
+         navController = navController,
+         paddingValues = it,
+         reminders = null,
+         mutableReminders = null,
+         context = null
+      ) }
    )
 }
