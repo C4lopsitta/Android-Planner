@@ -64,6 +64,10 @@ data class Reminder (
    @OptIn(DelicateCoroutinesApi::class)
    fun updateCompletionStatus() {
       this.isCompleted = !this.isCompleted
+      if(isCompleted)
+         this.completionDate = Time.from(Instant.now()).time
+      else
+         this.completionDate = null
       GlobalScope.launch { DB.getRemindersDAO()!!.update(this@Reminder) }
    }
 
@@ -90,12 +94,16 @@ data class Reminder (
       return Time.from(Instant.ofEpochMilli(this.creationDate)).toString()
    }
 
-   fun getBeautifiedNotification(): String {
-      return Time.from(Instant.ofEpochMilli(this.creationDate)).toString()
+   fun getBeautifiedNotification(): String? {
+      if(this.notificationDate == null)
+         return null
+      return Time.from(Instant.ofEpochMilli(this.notificationDate!!)).toString()
    }
 
-   fun getBeautifiedCompletedOn(): String {
-      return Time.from(Instant.ofEpochMilli(this.creationDate)).toString()
+   fun getBeautifiedCompletedOn(): String? {
+      if(this.completionDate == null)
+         return null
+      return Time.from(Instant.ofEpochMilli(this.completionDate!!)).toString()
    }
 }
 
@@ -131,7 +139,7 @@ fun ReminderRow(context: Context?, reminder: Reminder) {
             Text(text = reminder.title)
             if(reminder.notificationDate != null)
                Text(
-                  text = reminder.getBeautifiedNotification(),
+                  text = reminder.getBeautifiedNotification() ?: "",
                   fontSize = TextUnit(2.5F, TextUnitType.Em),
                   color = Color.Gray
                )

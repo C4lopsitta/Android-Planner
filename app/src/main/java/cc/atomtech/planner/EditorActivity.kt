@@ -15,9 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AirplanemodeActive
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
@@ -25,9 +23,10 @@ import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Save
 import androidx.compose.material.icons.rounded.TextFields
 import androidx.compose.material.icons.rounded.Update
-import androidx.compose.material3.Card
+import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -50,7 +49,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import cc.atomtech.planner.dataEntities.Reminder
 import cc.atomtech.planner.ui.theme.PlannerTheme
 import kotlinx.coroutines.GlobalScope
@@ -60,25 +58,27 @@ import java.time.Instant
 
 class EditorActivity : ComponentActivity() {
    lateinit var isCreator: MutableState<Boolean>
-   private lateinit var reminder: Reminder
+   private lateinit var reminder: MutableState<Reminder>
    @OptIn(ExperimentalMaterial3Api::class)
    override fun onCreate(savedInstanceState: Bundle?) {
       val superIntent = intent
+      var localReminder: Reminder = Reminder()
 
       //if we are not creating a reminder, we're editing one, so let's read it from the DB
       if(!superIntent.getBooleanExtra("isCreator", true))
          GlobalScope.launch {
-            reminder = DB.getRemindersDAO()
+            localReminder = DB.getRemindersDAO()
                ?.read(superIntent.getLongExtra("rowid", 0)) ?: Reminder()
          }
-      else
-         reminder = Reminder()
 
       super.onCreate(savedInstanceState)
 
       setContent {
          PlannerTheme {
+            reminder = remember { mutableStateOf(localReminder) }
             isCreator = remember { mutableStateOf(superIntent.getBooleanExtra("isCreator", true)) }
+            val showDatePickerDialog = remember { mutableStateOf(false) }
+            val showTimePickerDialog = remember { mutableStateOf(false) }
             val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
             Scaffold(
@@ -107,7 +107,7 @@ class EditorActivity : ComponentActivity() {
                      actions = {
                         if(!isCreator.value) {
                            IconButton(onClick = {
-                              reminder.delete()
+                              reminder.value.delete()
                               navigateUpTo(Intent(this@EditorActivity, MainActivity::class.java))
                            }) {
                               Icon(
@@ -122,9 +122,9 @@ class EditorActivity : ComponentActivity() {
                floatingActionButton = {
                   ExtendedFloatingActionButton(onClick = {
                         if (isCreator.value)
-                           reminder.store()
+                           reminder.value.store()
                         else
-                           reminder.update()
+                           reminder.value.update()
                      },
                      icon = { Icon(
                         imageVector = if(isCreator.value) Icons.Rounded.Save else Icons.Rounded.Update,
@@ -134,7 +134,17 @@ class EditorActivity : ComponentActivity() {
                   )
                },
                content = {
-                  EditorColumn(this@EditorActivity, it, reminder, isCreator)
+                  EditorColumn(this@EditorActivity, it, reminder, showDatePickerDialog)
+                  if(showDatePickerDialog.value) {
+                     DateDialog (
+                        onDismissRequest = {selectedDate ->
+                           showDatePickerDialog.value = false
+                           reminder.value.notificationDate = selectedDate
+                        },
+                        reminder = reminder.value,
+                        confirmText = getString(R.string.word_confirm)
+                     )
+                  }
                }
             )
          }
@@ -143,8 +153,11 @@ class EditorActivity : ComponentActivity() {
 }
 
 @Composable
-fun EditorColumn(context: Context?, paddingValues: PaddingValues, reminder: Reminder, isCreator: MutableState<Boolean>) {
-   val title = remember { mutableStateOf(reminder.title) }
+fun EditorColumn(context: Context?,
+                 paddingValues: PaddingValues,
+                 reminder: MutableState<Reminder>,
+                 showDialog: MutableState<Boolean>) {
+   val title = remember { mutableStateOf(reminder.value.title) }
    val notifies = remember { mutableStateOf(false) }
 
    Column (
@@ -155,7 +168,7 @@ fun EditorColumn(context: Context?, paddingValues: PaddingValues, reminder: Remi
       verticalArrangement = Arrangement.spacedBy(16.dp),
       horizontalAlignment = Alignment.CenterHorizontally
    ) {
-      SpanningTextField(value = title, onValueChanged = {title.value = it; reminder.title = it}, icon = Icons.Rounded.TextFields, context = context)
+      SpanningTextField(value = title, onValueChanged = {title.value = it; reminder.value.title = it}, icon = Icons.Rounded.TextFields, context = context)
       Row(
          modifier = Modifier
             .fillMaxWidth(),
@@ -167,18 +180,13 @@ fun EditorColumn(context: Context?, paddingValues: PaddingValues, reminder: Remi
             contentDescription = context?.getString(R.string.btn_editor_notification_date),
             modifier = Modifier.width(32.dp)
          )
-         Column (
-            //modifier = Modifier.fillMaxWidth()
-         ) {
+         Column {
             Text(text = context?.getString(R.string.btn_editor_notification_date) ?: "Notification date")
-            Text(text = reminder.getBeautifiedNotification())
+            Text(text = reminder.value.getBeautifiedNotification() ?: "")
          }
          IconButton(
             modifier = Modifier.width(32.dp),
-            onClick = {
-
-            },
-
+            onClick = { showDialog.value = true },
          ) {
             Icon(
                imageVector = Icons.Rounded.Edit,
@@ -187,7 +195,7 @@ fun EditorColumn(context: Context?, paddingValues: PaddingValues, reminder: Remi
          }
       }
 
-      SwitchRow(value = notifies, onValueChanged = {notifies.value = it; reminder.notifies = it}, label = context?.getString(R.string.lbl_recieve_notification) ?: "Receive a Notification")
+      SwitchRow(value = notifies, onValueChanged = {notifies.value = it; reminder.value.notifies = it}, label = context?.getString(R.string.lbl_recieve_notification) ?: "Receive a Notification")
    }
 }
 
@@ -226,33 +234,25 @@ fun SpanningTextField(value: MutableState<String>,
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DateDialog(title: String = "DatePicker" , onDismissRequest: () -> Unit) {
-   Dialog(
-      onDismissRequest = onDismissRequest,
-      content = {
-         Card(
-            modifier = Modifier
-               .fillMaxWidth()
-               .padding(16.dp),
-            shape = RoundedCornerShape(16.dp)
-         ){
-            Column {
-               val time = Time.from(Instant.now())
+fun DateDialog(confirmText: String = "Ok", onDismissRequest: (Long?) -> Unit, reminder: Reminder) {
+   val now = if(reminder.notificationDate == null) Time.from(Instant.now()).time else reminder.notificationDate
 
-               Text(text = title)
-               DatePicker(state = DatePickerState(
-                  initialSelectedDateMillis = time.time,
-                  initialDisplayedMonthMillis = null,
-                  yearRange = IntRange(2024, 2025),
-                  initialDisplayMode = DisplayMode.Picker
-               ))
-            }
-         }
+   //TODO: Remove hardcoded range
+   val datePickerState = DatePickerState(now, now, IntRange(2024, 2025), DisplayMode.Picker)
+
+   DatePickerDialog(
+      onDismissRequest = { onDismissRequest(datePickerState.selectedDateMillis) },
+      content = { DatePicker(state = datePickerState) },
+      confirmButton = {
+         Button(
+            onClick = { onDismissRequest(datePickerState.selectedDateMillis) },
+            content = { Text(text = confirmText) }
+         )
       }
    )
 }
 
-@Preview(showSystemUi = true, uiMode = UI_MODE_NIGHT_YES)
+/*@Preview(showSystemUi = true, uiMode = UI_MODE_NIGHT_YES)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun CreatorPreview() {
@@ -289,9 +289,15 @@ fun CreatorPreview() {
             )
          },
          content = {
-            EditorColumn(null, it, Reminder(), remember { mutableStateOf(false) })
+            EditorColumn(
+               null,
+               it,
+               Reminder(),
+               remember { mutableStateOf(false) },
+               remember { mutableStateOf(false) }
+            )
          }
       )
    }
-}
+}*/
 

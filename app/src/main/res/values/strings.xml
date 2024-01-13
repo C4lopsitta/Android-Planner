@@ -21,4 +21,5 @@
     <string name="btn_editor_notification_date">Notification Date</string>
     <string name="word_edit">Edit</string>
     <string name="fab_update_label">Update</string>
+    <string name="word_confirm">Confirm</string>
 </resources>
