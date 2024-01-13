@@ -71,6 +71,14 @@ data class Reminder (
       GlobalScope.launch { DB.getRemindersDAO()?.create(this@Reminder) }
    }
 
+   fun update() {
+      GlobalScope.launch { DB.getRemindersDAO()?.update(this@Reminder) }
+   }
+
+   fun delete() {
+      GlobalScope.launch { DB.getRemindersDAO()?.delete(this@Reminder) }
+   }
+
    fun getBriefTitle() {
       val lines = this.title.lines()
       // TODO: Add setting for longer previews

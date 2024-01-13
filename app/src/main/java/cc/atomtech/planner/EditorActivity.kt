@@ -14,11 +14,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AirplanemodeActive
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Save
 import androidx.compose.material.icons.rounded.TextFields
+import androidx.compose.material.icons.rounded.Update
+import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerState
+import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -44,17 +55,18 @@ import cc.atomtech.planner.dataEntities.Reminder
 import cc.atomtech.planner.ui.theme.PlannerTheme
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.sql.Time
+import java.time.Instant
 
 class EditorActivity : ComponentActivity() {
-   var isCreator: Boolean = false
+   lateinit var isCreator: MutableState<Boolean>
    private lateinit var reminder: Reminder
    @OptIn(ExperimentalMaterial3Api::class)
    override fun onCreate(savedInstanceState: Bundle?) {
       val superIntent = intent
-      isCreator = superIntent.getBooleanExtra("isCreator", true)
 
       //if we are not creating a reminder, we're editing one, so let's read it from the DB
-      if(!isCreator)
+      if(!superIntent.getBooleanExtra("isCreator", true))
          GlobalScope.launch {
             reminder = DB.getRemindersDAO()
                ?.read(superIntent.getLongExtra("rowid", 0)) ?: Reminder()
@@ -66,6 +78,7 @@ class EditorActivity : ComponentActivity() {
 
       setContent {
          PlannerTheme {
+            isCreator = remember { mutableStateOf(superIntent.getBooleanExtra("isCreator", true)) }
             val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
             Scaffold(
@@ -75,7 +88,7 @@ class EditorActivity : ComponentActivity() {
                      title = {
                         Text(
                            text = "${
-                              if(isCreator) getString(R.string.activity_create)
+                              if(isCreator.value) getString(R.string.activity_create)
                               else getString(R.string.activity_editor)
                            } ${getString(R.string.word_reminder)}"
                         )
@@ -90,23 +103,38 @@ class EditorActivity : ComponentActivity() {
                               contentDescription = getString(R.string.btn_back_desc)
                            )
                         }
+                     },
+                     actions = {
+                        if(!isCreator.value) {
+                           IconButton(onClick = {
+                              reminder.delete()
+                              navigateUpTo(Intent(this@EditorActivity, MainActivity::class.java))
+                           }) {
+                              Icon(
+                                 imageVector = Icons.Rounded.Delete,
+                                 contentDescription = ""
+                              )
+                           }
+                        }
                      }
                   )
                },
                floatingActionButton = {
                   ExtendedFloatingActionButton(onClick = {
-                        // TODO: make async
-                        reminder.store()
+                        if (isCreator.value)
+                           reminder.store()
+                        else
+                           reminder.update()
                      },
                      icon = { Icon(
-                        imageVector = Icons.Rounded.Save,
+                        imageVector = if(isCreator.value) Icons.Rounded.Save else Icons.Rounded.Update,
                         contentDescription = getString(R.string.fab_save_label)
                      ) },
-                     text = { Text(text = getString(R.string.fab_save_label)) }
+                     text = { Text(text = (if(isCreator.value) getString(R.string.fab_save_label) else getString(R.string.fab_update_label ))) }
                   )
                },
                content = {
-                  CreateColumn(this@EditorActivity, it, reminder)
+                  EditorColumn(this@EditorActivity, it, reminder, isCreator)
                }
             )
          }
@@ -115,7 +143,7 @@ class EditorActivity : ComponentActivity() {
 }
 
 @Composable
-fun CreateColumn(context: Context?, paddingValues: PaddingValues, reminder: Reminder) {
+fun EditorColumn(context: Context?, paddingValues: PaddingValues, reminder: Reminder, isCreator: MutableState<Boolean>) {
    val title = remember { mutableStateOf(reminder.title) }
    val notifies = remember { mutableStateOf(false) }
 
@@ -128,6 +156,37 @@ fun CreateColumn(context: Context?, paddingValues: PaddingValues, reminder: Remi
       horizontalAlignment = Alignment.CenterHorizontally
    ) {
       SpanningTextField(value = title, onValueChanged = {title.value = it; reminder.title = it}, icon = Icons.Rounded.TextFields, context = context)
+      Row(
+         modifier = Modifier
+            .fillMaxWidth(),
+         verticalAlignment = Alignment.CenterVertically,
+         horizontalArrangement = Arrangement.spacedBy(12.dp)
+      ) {
+         Icon(
+            imageVector = Icons.Rounded.Notifications,
+            contentDescription = context?.getString(R.string.btn_editor_notification_date),
+            modifier = Modifier.width(32.dp)
+         )
+         Column (
+            //modifier = Modifier.fillMaxWidth()
+         ) {
+            Text(text = context?.getString(R.string.btn_editor_notification_date) ?: "Notification date")
+            Text(text = reminder.getBeautifiedNotification())
+         }
+         IconButton(
+            modifier = Modifier.width(32.dp),
+            onClick = {
+
+            },
+
+         ) {
+            Icon(
+               imageVector = Icons.Rounded.Edit,
+               contentDescription = context?.getString(R.string.word_edit)
+            )
+         }
+      }
+
       SwitchRow(value = notifies, onValueChanged = {notifies.value = it; reminder.notifies = it}, label = context?.getString(R.string.lbl_recieve_notification) ?: "Receive a Notification")
    }
 }
@@ -165,12 +224,32 @@ fun SpanningTextField(value: MutableState<String>,
    )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DateDialog(onDismissRequest: () -> Unit) {
+fun DateDialog(title: String = "DatePicker" , onDismissRequest: () -> Unit) {
    Dialog(
       onDismissRequest = onDismissRequest,
-      content = {}
-      )
+      content = {
+         Card(
+            modifier = Modifier
+               .fillMaxWidth()
+               .padding(16.dp),
+            shape = RoundedCornerShape(16.dp)
+         ){
+            Column {
+               val time = Time.from(Instant.now())
+
+               Text(text = title)
+               DatePicker(state = DatePickerState(
+                  initialSelectedDateMillis = time.time,
+                  initialDisplayedMonthMillis = null,
+                  yearRange = IntRange(2024, 2025),
+                  initialDisplayMode = DisplayMode.Picker
+               ))
+            }
+         }
+      }
+   )
 }
 
 @Preview(showSystemUi = true, uiMode = UI_MODE_NIGHT_YES)
@@ -210,7 +289,7 @@ fun CreatorPreview() {
             )
          },
          content = {
-            CreateColumn(null, it, Reminder())
+            EditorColumn(null, it, Reminder(), remember { mutableStateOf(false) })
          }
       )
    }
