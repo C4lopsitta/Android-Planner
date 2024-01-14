@@ -73,8 +73,10 @@ dependencies {
 
    ksp("androidx.room:room-compiler:2.6.1")
 
-   //proto datastore preferences
+   // datastore preferences
    implementation("androidx.datastore:datastore-preferences:1.0.0")
+   implementation("io.insert-koin:koin-android:3.1.4")
+   implementation("com.google.code.gson:gson:2.9.0")
 
    testImplementation("junit:junit:4.13.2")
    androidTestImplementation("androidx.test.ext:junit:1.1.5")

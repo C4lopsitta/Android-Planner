@@ -22,4 +22,6 @@
     <string name="word_edit">Edit</string>
     <string name="fab_update_label">Update</string>
     <string name="word_confirm">Confirm</string>
+    <string name="word_version">Version</string>
+    <string name="lbl_settings_useSearch">Use experimental home search bar</string>
 </resources>

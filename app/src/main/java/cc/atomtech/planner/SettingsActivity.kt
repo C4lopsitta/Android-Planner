@@ -1,11 +1,16 @@
 package cc.atomtech.planner
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
@@ -17,8 +22,20 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
+import androidx.compose.ui.unit.dp
+import cc.atomtech.planner.ui.components.SwitchRow
 import cc.atomtech.planner.ui.theme.PlannerTheme
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+
 
 class SettingsActivity : ComponentActivity() {
    @OptIn(ExperimentalMaterial3Api::class)
@@ -45,14 +62,49 @@ class SettingsActivity : ComponentActivity() {
                   )
                },
                content = {
+                  val usesHomeSearch = remember { mutableStateOf(AppPreferences.readBoolean(this@SettingsActivity, "useSearchTopBar")) }
+                  Log.i("SETTINGS_ACTIVITY", "read value ${usesHomeSearch.value}")
                   Column (
-                     modifier = Modifier.padding(it)
+                     modifier = Modifier
+                        .padding(it)
+                        .fillMaxSize()
                   ) {
-
+                     //TODO: Fix alignment
+                     SwitchRow(
+                        value = usesHomeSearch,
+                        label = getString(R.string.lbl_settings_useSearch),
+                        onValueChanged = {
+                           usesHomeSearch.value = !usesHomeSearch.value
+                           GlobalScope.launch {
+                              AppPreferences.writeBoolean(
+                                 this@SettingsActivity,
+                                 "useSearchTopBar",
+                                 usesHomeSearch.value
+                              )
+                           }
+                        }
+                     )
+                     VersionInfo(this@SettingsActivity)
                   }
                }
             )
          }
       }
+   }
+}
+
+@Composable
+fun VersionInfo(context: Context) {
+   val versionName = context.packageManager.getPackageInfo(context.packageName, 0).versionName
+   Box(
+      modifier = Modifier.height(32.dp),
+      contentAlignment = Alignment.BottomCenter
+   ) {
+      Text(
+         text = context.getString(R.string.word_version) + " " + versionName,
+         textAlign = TextAlign.Center,
+         fontSize = TextUnit(2.75f, TextUnitType.Em),
+         modifier = Modifier.fillMaxWidth()
+      )
    }
 }
