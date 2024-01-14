@@ -24,4 +24,5 @@
     <string name="word_confirm">Confirm</string>
     <string name="word_version">Version</string>
     <string name="lbl_settings_useSearch">Use experimental home search bar</string>
+    <string name="lbl_warn_no_notif">Notification are currently not sent yet</string>
 </resources>

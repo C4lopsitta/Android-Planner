@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Save
 import androidx.compose.material.icons.rounded.TextFields
@@ -45,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import cc.atomtech.planner.dataEntities.Reminder
+import cc.atomtech.planner.ui.components.IconText
 import cc.atomtech.planner.ui.components.SwitchRow
 import cc.atomtech.planner.ui.theme.PlannerTheme
 import kotlinx.coroutines.GlobalScope
@@ -170,7 +172,8 @@ fun EditorColumn(context: Context?,
             .fillMaxWidth(),
          verticalAlignment = Alignment.CenterVertically,
          horizontalArrangement = Arrangement.spacedBy(12.dp)
-      ) {
+      )
+      {
          Icon(
             imageVector = Icons.Rounded.Notifications,
             contentDescription = context?.getString(R.string.btn_editor_notification_date),
@@ -178,7 +181,8 @@ fun EditorColumn(context: Context?,
          )
          Column {
             Text(text = context?.getString(R.string.btn_editor_notification_date) ?: "Notification date")
-            Text(text = reminder.value.getBeautifiedNotification() ?: "")
+            if(reminder.value.notificationDate != null)
+               Text(text = reminder.value.getBeautifiedNotification() ?: "")
          }
          IconButton(
             modifier = Modifier.width(32.dp),
@@ -192,6 +196,14 @@ fun EditorColumn(context: Context?,
       }
 
       SwitchRow(value = notifies, onValueChanged = {notifies.value = it; reminder.value.notifies = it}, label = context?.getString(R.string.lbl_recieve_notification) ?: "Receive a Notification")
+      if(notifies.value)
+         IconText(
+            imageVector = Icons.Rounded.Info,
+            text = context?.getString(R.string.lbl_warn_no_notif) ?: "",
+            modifier = Modifier
+               .fillMaxWidth(),
+            isError = true
+         )
    }
 }
 
