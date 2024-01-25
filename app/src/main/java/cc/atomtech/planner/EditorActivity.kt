@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,7 +14,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Delete
@@ -29,13 +32,19 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.DisplayMode
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -44,8 +53,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import cc.atomtech.planner.dataEntities.Project
 import cc.atomtech.planner.dataEntities.Reminder
 import cc.atomtech.planner.ui.components.IconText
 import cc.atomtech.planner.ui.components.SwitchRow
@@ -63,12 +76,18 @@ class EditorActivity : ComponentActivity() {
       val superIntent = intent
       var localReminder: Reminder = Reminder()
 
+      var projectList: MutableList<Project> = mutableListOf()
+
       //if we are not creating a reminder, we're editing one, so let's read it from the DB
       if(!superIntent.getBooleanExtra("isCreator", true))
          GlobalScope.launch {
             localReminder = DB.getRemindersDAO()
                ?.read(superIntent.getLongExtra("rowid", 0)) ?: Reminder()
          }
+
+      GlobalScope.launch {
+         projectList = (DB.getProjectsDAO()?.readAll())?.toMutableList()!!
+      }
 
       super.onCreate(savedInstanceState)
 
@@ -135,7 +154,7 @@ class EditorActivity : ComponentActivity() {
                   )
                },
                content = {
-                  EditorColumn(this@EditorActivity, it, reminder, showDatePickerDialog)
+                  EditorColumn(this@EditorActivity, it, reminder, projectList, showDatePickerDialog)
                   if(showDatePickerDialog.value) {
                      DateDialog (
                         onDismissRequest = {selectedDate ->
@@ -153,13 +172,22 @@ class EditorActivity : ComponentActivity() {
    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditorColumn(context: Context?,
                  paddingValues: PaddingValues,
                  reminder: MutableState<Reminder>,
+                 projects: MutableList<Project>,
                  showDialog: MutableState<Boolean>) {
    val title = remember { mutableStateOf(reminder.value.title) }
    val notifies = remember { mutableStateOf(false) }
+   val isProjectDropdownExpanded = remember { mutableStateOf(false) }
+   val chosenProject = remember {
+      if(reminder.value.id == null)
+         mutableStateOf(projects[0])
+      else
+         mutableStateOf(projects[((reminder.value.projectIdentifier ?: 1) - 1).toInt()])
+   }
 
    Column (
       modifier = Modifier
@@ -207,8 +235,44 @@ fun EditorColumn(context: Context?,
                .fillMaxWidth(),
             isError = true
          )
-      
-      Text(text = "Temporary text: This reminder references project ${reminder.value.projectIdentifier}")
+
+      ExposedDropdownMenuBox(
+         expanded = isProjectDropdownExpanded.value,
+         onExpandedChange = {isProjectDropdownExpanded.value = !isProjectDropdownExpanded.value},
+         modifier = Modifier.fillMaxWidth()
+      ) {
+         TextField(
+            value = "${chosenProject.value.name} (color #${chosenProject.value.color})",
+            onValueChange = {},
+            readOnly = true,
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isProjectDropdownExpanded.value) },
+            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+            modifier = Modifier
+               .menuAnchor()
+               .fillMaxWidth()
+         )
+
+         ExposedDropdownMenu(
+            expanded = isProjectDropdownExpanded.value,
+            onDismissRequest = { isProjectDropdownExpanded.value = false },
+            modifier = Modifier.fillMaxWidth()
+         ) {
+            projects.forEach { project ->
+               DropdownMenuItem(
+                  text = {
+                     Text(text = "${project.name} (color #${project.color})")
+                  },
+                  modifier = Modifier.fillMaxWidth(),
+                  onClick = {
+                     chosenProject.value = project
+                     isProjectDropdownExpanded.value = false
+                  }
+               )
+            }
+         }
+      }
+
+
    }
 }
 
@@ -250,52 +314,46 @@ fun DateDialog(confirmText: String = "Ok", onDismissRequest: (Long?) -> Unit, re
    )
 }
 
-/*@Preview(showSystemUi = true, uiMode = UI_MODE_NIGHT_YES)
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@Preview()
 @Composable
-fun CreatorPreview() {
+fun Column() {
    PlannerTheme {
-      val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+      val reminder = remember { mutableStateOf(Reminder(title = "Lorem ipsum")) }
+      val isCreator = remember { mutableStateOf(false) }
+      val showDatePickerDialog = remember { mutableStateOf(false) }
+      val showTimePickerDialog = remember { mutableStateOf(false) }
 
       Scaffold(
          modifier = Modifier.fillMaxSize(),
-         topBar = {
-            CenterAlignedTopAppBar(
-               title = {
-                  Text(
-                     text = "Create reminder"
-                  )
-               },
-               scrollBehavior = scrollBehavior,
-               navigationIcon = {
-                  IconButton(onClick = {}) {
-                     Icon(
-                        imageVector = Icons.Rounded.ArrowBack,
-                        contentDescription = ""
-                     )
-                  }
-               }
-            )
-         },
-         floatingActionButton = {
-            ExtendedFloatingActionButton(onClick = {},
-               icon = { Icon(
-                  imageVector = Icons.Rounded.Save,
-                  contentDescription = "Add") },
-               text = { Text(text = "Add") },
 
+         floatingActionButton = {
+            ExtendedFloatingActionButton(onClick = {
+               if (isCreator.value)
+                  reminder.value.store()
+               else
+                  reminder.value.update()
+               Log.i("EDITOR", "User triggered store/update, returning")
+            },
+               icon = { Icon(
+                  imageVector = if(isCreator.value) Icons.Rounded.Save else Icons.Rounded.Update,
+                  contentDescription = ""
+               ) },
+               text = { Text(text = "Save/Update") }
             )
          },
          content = {
-            EditorColumn(
-               null,
-               it,
-               Reminder(),
-               remember { mutableStateOf(false) },
-               remember { mutableStateOf(false) }
-            )
+            EditorColumn(null, it, reminder, mutableListOf(Project(name = "Lorem ipsum", color = "", isImportant = false)), showDatePickerDialog)
+            if(showDatePickerDialog.value) {
+               DateDialog (
+                  onDismissRequest = {selectedDate ->
+                     showDatePickerDialog.value = false
+                     reminder.value.notificationDate = selectedDate
+                  },
+                  reminder = reminder.value,
+                  confirmText = "Confirm"
+               )
+            }
          }
       )
    }
-}*/
-
+}
