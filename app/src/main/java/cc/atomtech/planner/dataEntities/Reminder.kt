@@ -39,11 +39,11 @@ import java.time.Instant
 
 @Entity(
    tableName = "reminders",
-   //foreignKeys = [ForeignKey(
-   //   entity = Project::class,
-   //   parentColumns = arrayOf("rowid"),
-   //   childColumns = arrayOf("projectIdentifier")
-   //)]
+   foreignKeys = [ForeignKey(
+      entity = Project::class,
+      parentColumns = arrayOf("rowid"),
+      childColumns = arrayOf("projectIdentifier")
+   )]
 )
 data class Reminder (
    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "rowid") val id: Long? = null,
@@ -55,7 +55,7 @@ data class Reminder (
    @ColumnInfo()                    var notifies: Boolean = false,
    @ColumnInfo()                    var labels: ArrayList<String> = ArrayList(),
    @ColumnInfo()                    var appertainsTo: String? = null,
-   @ColumnInfo()                    var projectIdentifier: Long? = -1
+   @ColumnInfo()                    var projectIdentifier: Long? = 1
 ) {
    fun isLate(): Boolean {
       val now: Long = Time.from(Instant.now()).time

@@ -2,6 +2,8 @@ package cc.atomtech.planner
 
 import android.content.Context
 import androidx.room.*
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import cc.atomtech.planner.dataEntities.Project
 import cc.atomtech.planner.dataEntities.Reminder
 
@@ -21,6 +23,24 @@ interface RemindersDAO {
 
    @Delete
    fun delete(reminder: Reminder)
+}
+
+@Dao
+interface ProjectsDAO {
+   @Query("SELECT * FROM projects WHERE rowid = :id")
+   suspend fun read(id: Long): Project
+
+   @Query("SELECT * FROM projects")
+   suspend fun readAll(): List<Project>
+
+   @Insert
+   fun create(project: Project): Long
+
+   @Update
+   fun update(project: Project)
+
+   @Delete
+   fun delete(project: Project)
 }
 
 class Converters {
@@ -44,10 +64,11 @@ class Converters {
    }
 }
 
-@Database(entities = [Reminder::class, Project::class], version = 1)
+@Database(entities = [Reminder::class, Project::class], version = 2)
 @TypeConverters(Converters::class)
 abstract class DAO: RoomDatabase() {
    abstract fun reminders(): RemindersDAO
+   abstract fun projects(): ProjectsDAO
 }
 
 class DB() {
@@ -61,6 +82,7 @@ class DB() {
             db = Room.databaseBuilder(context, DAO::class.java, "planner_db")
                .fallbackToDestructiveMigration()
                .fallbackToDestructiveMigrationOnDowngrade()
+               .fallbackToDestructiveMigration()
                .build()
             return
          }
@@ -72,6 +94,20 @@ class DB() {
          if(db != null)
             return (db as DAO).reminders()
          return null
+      }
+
+      fun getProjectsDAO(): ProjectsDAO? {
+         if(db != null)
+            return (db as DAO).projects()
+         return null
+      }
+   }
+}
+
+object Migrations {
+   val v1_2 = object : Migration(1, 2) {
+      override fun migrate(db: SupportSQLiteDatabase) {
+
       }
    }
 }

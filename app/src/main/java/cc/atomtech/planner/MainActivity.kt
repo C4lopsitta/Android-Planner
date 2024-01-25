@@ -50,12 +50,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import cc.atomtech.planner.dataEntities.NavbarItem
+import cc.atomtech.planner.dataEntities.Project
 import cc.atomtech.planner.dataEntities.Reminder
 import cc.atomtech.planner.ui.pages.Dashboard
 import cc.atomtech.planner.ui.pages.Labels
 import cc.atomtech.planner.ui.pages.Projects
 import cc.atomtech.planner.ui.theme.PlannerTheme
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -65,12 +68,28 @@ class MainActivity : ComponentActivity() {
 
    @OptIn(ExperimentalMaterial3Api::class)
    override fun onCreate(savedInstanceState: Bundle?) {
-      DB.Connect(context = this@MainActivity, allowDestructiveMigration = false)
+      DB.Connect(context = this@MainActivity, allowDestructiveMigration = true)
+
+      CoroutineScope(Dispatchers.Default).launch {
+         val isntFirstLaunch = AppPreferences.readBoolean(this@MainActivity, "isntFirstLaunch")
+         if(isntFirstLaunch) return@launch
+         AppPreferences.writeBoolean(this@MainActivity, "isntFirstLaunch", true)
+         Log.i("MAIN_ACTIVITY", "App has been launched for the first time, running setup")
+
+         // Create default project (id 1)
+         DB.getProjectsDAO()?.create(Project(1, "Default project", "ffffff", false))
+
+         //Todo)) Add some default reminders
+
+         //TODO)) Launch first installation experience
+      }
+
       var reminders: MutableList<Reminder>? = null
 
       GlobalScope.launch {
          reminders = (DB.getRemindersDAO()?.readAll())?.toMutableList()
       }
+
 
       super.onCreate(savedInstanceState)
       setContent {
