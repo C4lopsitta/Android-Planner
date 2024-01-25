@@ -29,6 +29,7 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import cc.atomtech.planner.DB
 import cc.atomtech.planner.EditorActivity
+import cc.atomtech.planner.Values
 import cc.atomtech.planner.ui.theme.PlannerTheme
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -83,10 +84,16 @@ data class Reminder (
       GlobalScope.launch { DB.getRemindersDAO()?.delete(this@Reminder) }
    }
 
-   fun getBriefTitle() {
-      val lines = this.title.lines()
-      // TODO: Add setting for longer previews
+   fun getBriefTitle(lines: Int = Values.reminderLines, chars: Int = Values.reminderChars): String {
+      var body = this.title
+      if (body.length > chars) {
+         body = this.title.substring(0, chars)
+         body += "…"
+      }
 
+
+      // TODO)) Add device targets
+      return body
    }
 
    // TODO: Actually beautify
@@ -136,7 +143,7 @@ fun ReminderRow(context: Context?, reminder: Reminder) {
                isChecked.value = !isChecked.value
             })
          Column {
-            Text(text = reminder.title)
+            Text(text = reminder.getBriefTitle())
             if(reminder.notificationDate != null)
                Text(
                   text = reminder.getBeautifiedNotification() ?: "",
@@ -151,7 +158,7 @@ fun ReminderRow(context: Context?, reminder: Reminder) {
 @Preview(showBackground = true)
 @Composable
 fun ReminderRowPreview() {
-   val reminder = Reminder(isCompleted = true, notificationDate = Time.from(Instant.now()).time)
+   val reminder = Reminder(isCompleted = true, title = "Lorem ipsum", notificationDate = Time.from(Instant.now()).time)
    PlannerTheme {
       ReminderRow(context = null, reminder = reminder)
    }

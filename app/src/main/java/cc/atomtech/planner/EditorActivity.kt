@@ -123,6 +123,7 @@ class EditorActivity : ComponentActivity() {
                            reminder.value.store()
                         else
                            reminder.value.update()
+                        navigateUpTo(Intent(this@EditorActivity, MainActivity::class.java))
                      },
                      icon = { Icon(
                         imageVector = if(isCreator.value) Icons.Rounded.Save else Icons.Rounded.Update,

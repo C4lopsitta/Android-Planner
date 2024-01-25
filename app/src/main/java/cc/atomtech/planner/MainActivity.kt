@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -41,6 +42,8 @@ import androidx.compose.ui.unit.dp
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -60,21 +63,13 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "pr
 
 class MainActivity : ComponentActivity() {
 
-   @OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
+   @OptIn(ExperimentalMaterial3Api::class)
    override fun onCreate(savedInstanceState: Bundle?) {
-      var useSearchTopBar = false
-      GlobalScope.launch { useSearchTopBar = AppPreferences.readBoolean(this@MainActivity, "useSearchTopBar") }
-
       DB.Connect(context = this@MainActivity, allowDestructiveMigration = false)
       var reminders: MutableList<Reminder>? = null
 
       GlobalScope.launch {
          reminders = (DB.getRemindersDAO()?.readAll())?.toMutableList()
-         Log.i("REMINDER DUMP", "--- begin dump ---")
-         reminders?.forEach {
-            Log.i("REMINDER", it.toString())
-         }
-         Log.i("REMINDER DUMP", "--- end dump ---")
       }
 
       super.onCreate(savedInstanceState)
@@ -85,10 +80,16 @@ class MainActivity : ComponentActivity() {
 
             val mutableReminders = remember { reminders }
 
+            val useSearchTopBar = remember { mutableStateOf(false) }
+
+            LaunchedEffect(Unit) {
+               useSearchTopBar.value = AppPreferences.readBoolean(this@MainActivity, "useSearchTopBar")
+            }
+
             // A surface container using the 'background' color from the theme
             Scaffold (
                topBar = {
-                  if(useSearchTopBar)
+                  if(useSearchTopBar.value)
                      SearchBar(context = this@MainActivity)
                   else
                      CenterAlignedTopAppBar(
@@ -224,7 +225,7 @@ fun SearchBar(context: Context) {
          },
          trailingIcon = {
             IconButton(onClick = {
-               GlobalScope.launch { AppPreferences.writeBoolean(context, "useSearchTopBar", false) }
+               context.startActivity(Intent(context, SettingsActivity::class.java))
             }) {
                Icon(
                   imageVector = Icons.Rounded.Settings,

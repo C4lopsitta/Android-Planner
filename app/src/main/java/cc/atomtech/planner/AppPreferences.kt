@@ -15,16 +15,12 @@ import java.lang.reflect.Type
 
 class AppPreferences {
    companion object {
-      fun readBoolean(context: Context, key: String): Boolean {
-         var ret: Boolean = false
-         GlobalScope.launch {
-            val KEY = booleanPreferencesKey(key)
-            val flow: Flow<Boolean> = context.dataStore.data.map {
-               it[KEY] ?: false
-            }
-            ret = flow.first()
+      suspend fun readBoolean(context: Context, key: String): Boolean {
+         val KEY = booleanPreferencesKey(key)
+         val flow: Flow<Boolean> = context.dataStore.data.map {
+            it[KEY] ?: false
          }
-         return ret
+         return flow.first()
       }
 
       //TODO: Switch to job

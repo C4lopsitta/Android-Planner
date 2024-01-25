@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -46,6 +47,12 @@ class SettingsActivity : ComponentActivity() {
          PlannerTheme {
             val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
+            val usesHomeSearch = remember { mutableStateOf(false) }
+
+            LaunchedEffect(Unit) {
+               usesHomeSearch.value = AppPreferences.readBoolean(this@SettingsActivity, "useSearchTopBar")
+            }
+
             Scaffold (
                modifier = Modifier.fillMaxSize(),
                topBar = {
@@ -62,7 +69,6 @@ class SettingsActivity : ComponentActivity() {
                   )
                },
                content = {
-                  val usesHomeSearch = remember { mutableStateOf(AppPreferences.readBoolean(this@SettingsActivity, "useSearchTopBar")) }
                   Log.i("SETTINGS_ACTIVITY", "read value ${usesHomeSearch.value}")
                   Column (
                      modifier = Modifier
