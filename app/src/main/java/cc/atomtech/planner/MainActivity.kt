@@ -72,12 +72,19 @@ class MainActivity : ComponentActivity() {
 
       CoroutineScope(Dispatchers.Default).launch {
          val isntFirstLaunch = AppPreferences.readBoolean(this@MainActivity, "isntFirstLaunch")
+
          if(isntFirstLaunch) return@launch
+
          AppPreferences.writeBoolean(this@MainActivity, "isntFirstLaunch", true)
          Log.i("MAIN_ACTIVITY", "App has been launched for the first time, running setup")
 
          // Create default project (id 1)
-         DB.getProjectsDAO()?.create(Project(1, "Default project", "ffffff", false))
+         DB.getProjectsDAO()?.create(Project(name = "Default project", color = "ffffff", isImportant = false))
+
+         val projects = DB.getProjectsDAO()?.readAll()
+         projects?.forEach { project ->
+            Log.i("PROJECTS", "--> ${project.toString()}")
+         }
 
          //Todo)) Add some default reminders
 
@@ -88,6 +95,9 @@ class MainActivity : ComponentActivity() {
 
       GlobalScope.launch {
          reminders = (DB.getRemindersDAO()?.readAll())?.toMutableList()
+
+
+
       }
 
 

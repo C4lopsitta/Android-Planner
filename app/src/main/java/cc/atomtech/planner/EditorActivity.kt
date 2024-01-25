@@ -3,6 +3,7 @@ package cc.atomtech.planner
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -123,6 +124,7 @@ class EditorActivity : ComponentActivity() {
                            reminder.value.store()
                         else
                            reminder.value.update()
+                        Log.i("EDITOR", "User triggered store/update, returning")
                         navigateUpTo(Intent(this@EditorActivity, MainActivity::class.java))
                      },
                      icon = { Icon(
@@ -205,6 +207,8 @@ fun EditorColumn(context: Context?,
                .fillMaxWidth(),
             isError = true
          )
+      
+      Text(text = "Temporary text: This reminder references project ${reminder.value.projectIdentifier}")
    }
 }
 

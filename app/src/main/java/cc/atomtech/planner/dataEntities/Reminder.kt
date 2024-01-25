@@ -54,8 +54,7 @@ data class Reminder (
    @ColumnInfo()                    var notificationDate: Long? = null,
    @ColumnInfo()                    var notifies: Boolean = false,
    @ColumnInfo()                    var labels: ArrayList<String> = ArrayList(),
-   @ColumnInfo()                    var appertainsTo: String? = null,
-   @ColumnInfo()                    var projectIdentifier: Long? = 1
+   @ColumnInfo(index = true)        var projectIdentifier: Long? = 1
 ) {
    fun isLate(): Boolean {
       val now: Long = Time.from(Instant.now()).time
