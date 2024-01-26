@@ -146,7 +146,7 @@ fun ReminderRow(context: Context?, reminder: Reminder) {
             if(reminder.notificationDate != null)
                Text(
                   text = reminder.getBeautifiedNotification() ?: "",
-                  fontSize = TextUnit(2.5F, TextUnitType.Em),
+                  fontSize = TextUnit(12F, TextUnitType.Sp),
                   color = Color.Gray
                )
          }
