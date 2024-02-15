@@ -28,18 +28,28 @@ import androidx.compose.ui.unit.dp
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Fts4
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import cc.atomtech.planner.DB
 import cc.atomtech.planner.EditorActivity
 import cc.atomtech.planner.ui.theme.PlannerTheme
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @Entity(tableName = "projects")
 data class Project(
    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "rowid") var id: Long = 0,
    @ColumnInfo()                    var name: String,
    @ColumnInfo()                    var color: String,
-   @ColumnInfo()                    var isImportant: Boolean
+   @ColumnInfo()                    var isImportant: Boolean,
+   @ColumnInfo()                    var reminderCount: Int = 0,
 ) {
-
+   fun loadCount() {
+      GlobalScope.launch {
+         val count = (DB.getRemindersDAO()?.countRemindersInProject((this@Project).id)) ?: 0
+         reminderCount = count
+      }
+   }
 }
 
 @Composable
@@ -70,7 +80,7 @@ fun ProjectRow(project: Project) {
          Column {
             Text(text = project.name)
             Text(
-               text = "Contains ##### reminders",
+               text = "Contains ${project.reminderCount} reminders",
                fontSize = TextUnit(12F, TextUnitType.Sp),
                color = Color.Gray
             )

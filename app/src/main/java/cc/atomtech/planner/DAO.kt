@@ -15,6 +15,9 @@ interface RemindersDAO {
    @Query("SELECT * FROM reminders")
    suspend fun readAll(): List<Reminder>
 
+   @Query("SELECT COUNT(*) FROM reminders WHERE projectIdentifier = :project")
+   suspend fun countRemindersInProject(project: Long): Int
+
    @Insert
    fun create(reminder: Reminder): Long
 
@@ -64,7 +67,7 @@ class Converters {
    }
 }
 
-@Database(entities = [Reminder::class, Project::class], version = 2)
+@Database(entities = [Reminder::class, Project::class], version = 3)
 @TypeConverters(Converters::class)
 abstract class DAO: RoomDatabase() {
    abstract fun reminders(): RemindersDAO
@@ -81,11 +84,11 @@ class DB() {
          if(allowDestructiveMigration) {
             db = Room.databaseBuilder(context, DAO::class.java, "planner_db")
                .fallbackToDestructiveMigration()
-               .fallbackToDestructiveMigrationOnDowngrade()
                .build()
             return
          }
          db = Room.databaseBuilder(context, DAO::class.java, "planner_db")
+            .addMigrations(Migrations.v2_3)
             .build()
       }
 
@@ -105,6 +108,12 @@ class DB() {
 
 object Migrations {
    val v1_2 = object : Migration(1, 2) {
+      override fun migrate(db: SupportSQLiteDatabase) {
+
+      }
+   }
+
+   val v2_3 = object : Migration(2, 3) {
       override fun migrate(db: SupportSQLiteDatabase) {
 
       }

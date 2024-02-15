@@ -2,6 +2,7 @@ package cc.atomtech.planner
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -14,6 +15,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -61,6 +64,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlin.system.exitProcess
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "preferences")
 
@@ -99,59 +103,105 @@ class MainActivity : ComponentActivity() {
          projects = (DB.getProjectsDAO()?.readAll())?.toMutableList()!!
       }
 
-
       super.onCreate(savedInstanceState)
-      setContent {
-         PlannerTheme {
-            val navController = rememberNavController()
-            val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
-            val mutableReminders = remember { reminders }
-
-            val useSearchTopBar = remember { mutableStateOf(false) }
-
-            LaunchedEffect(Unit) {
-               useSearchTopBar.value = AppPreferences.readBoolean(this@MainActivity, "useSearchTopBar")
+      if(projects.size == 0)
+         setContent {
+            PlannerTheme {
+               AlertDialog(
+                  onDismissRequest = {},
+                  confirmButton = { Button(onClick = {
+                     exitProcess(0)
+                  }) {
+                     Text(text = getString(R.string.wrong_install_close))
+                  } },
+                  dismissButton = { Button(onClick = {
+                     val uri = Uri.parse("https://github.com/c4lopsitta/Android-Planner/issues")
+                     val intent = Intent(Intent.ACTION_VIEW, uri)
+                     startActivity(intent)
+                  }) {
+                     Text(text = getString(R.string.wrong_install_make_issue))
+                  }},
+                  title = { Text(text = getString(R.string.wrong_install_title)) },
+                  text = { Text(text = getString(R.string.wrong_install_body)) }
+               )
             }
-
-            // A surface container using the 'background' color from the theme
-            Scaffold (
-               topBar = {
-                  if(useSearchTopBar.value)
-                     SearchBar(context = this@MainActivity)
-                  else
-                     CenterAlignedTopAppBar(
-                        title = { Text(text = getString(R.string.app_name), maxLines = 1, overflow = TextOverflow.Ellipsis) },
-                        actions = {
-                           IconButton(onClick = {
-                              startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
-                           }) { Icon(imageVector = Icons.Rounded.Settings, contentDescription = getString(R.string.btn_settings_desc)) }
-                        },
-                        scrollBehavior = scrollBehavior
-                     )
-               },
-               bottomBar = { Navbar(
-                  navController = navController,
-                  navItems = NavbarItem.BuildList(this)
-               )},
-               floatingActionButton = { ExtendedFloatingActionButton(
-                  onClick = { fabOnClick() },
-                  text = { Text(text = getString(R.string.fab_add_label)) },
-                  icon = { Icon(Icons.Rounded.Add, getString(R.string.fab_add_label)) },
-                  shape = FloatingActionButtonDefaults.extendedFabShape
-               )},
-               floatingActionButtonPosition = FabPosition.End,
-               content = { ContentController(
-                  navController = navController,
-                  paddingValues = it,
-                  context = this,
-                  reminders = reminders,
-                  mutableReminders = mutableReminders,
-                  mutableProjcets = projects
-               )}
-            )
          }
-      }
+      else
+         setContent {
+            PlannerTheme {
+               val navController = rememberNavController()
+               val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+
+               val mutableReminders = remember { reminders }
+
+               val useSearchTopBar = remember { mutableStateOf(false) }
+
+               LaunchedEffect(Unit) {
+                  useSearchTopBar.value =
+                     AppPreferences.readBoolean(this@MainActivity, "useSearchTopBar")
+               }
+
+               // A surface container using the 'background' color from the theme
+               Scaffold(
+                  topBar = {
+                     if (useSearchTopBar.value)
+                        SearchBar(context = this@MainActivity)
+                     else
+                        CenterAlignedTopAppBar(
+                           title = {
+                              Text(
+                                 text = getString(R.string.app_name),
+                                 maxLines = 1,
+                                 overflow = TextOverflow.Ellipsis
+                              )
+                           },
+                           actions = {
+                              IconButton(onClick = {
+                                 startActivity(
+                                    Intent(
+                                       this@MainActivity,
+                                       SettingsActivity::class.java
+                                    )
+                                 )
+                              }) {
+                                 Icon(
+                                    imageVector = Icons.Rounded.Settings,
+                                    contentDescription = getString(R.string.btn_settings_desc)
+                                 )
+                              }
+                           },
+                           scrollBehavior = scrollBehavior
+                        )
+                  },
+                  bottomBar = {
+                     Navbar(
+                        navController = navController,
+                        navItems = NavbarItem.BuildList(this)
+                     )
+                  },
+                  floatingActionButton = {
+                     ExtendedFloatingActionButton(
+                        onClick = { fabOnClick() },
+                        text = { Text(text = getString(R.string.fab_add_label)) },
+                        icon = { Icon(Icons.Rounded.Add, getString(R.string.fab_add_label)) },
+                        shape = FloatingActionButtonDefaults.extendedFabShape
+                     )
+                  },
+                  floatingActionButtonPosition = FabPosition.End,
+                  content = {
+                     ContentController(
+                        navController = navController,
+                        paddingValues = it,
+                        context = this,
+                        reminders = reminders,
+                        mutableReminders = mutableReminders,
+                        mutableProjcets = projects
+                     )
+                  }
+               )
+            }
+         }
    }
 
    private fun fabOnClick() {

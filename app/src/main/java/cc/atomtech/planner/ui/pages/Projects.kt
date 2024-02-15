@@ -21,6 +21,7 @@ fun Projects(projects: MutableList<Project>) {
          content = {
             items(count = projects.size, key = null) { index ->
                val item = projects[index]
+               item.loadCount()
                ProjectRow(project = item)
             }
       })
