@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
@@ -48,9 +49,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import cc.atomtech.planner.dataEntities.ColorEntity
 import cc.atomtech.planner.dataEntities.Project
 import cc.atomtech.planner.dataEntities.Reminder
 import cc.atomtech.planner.ui.components.IconText
@@ -60,6 +63,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.sql.Time
 import java.time.Instant
+import java.util.Locale
 
 class EditorActivity : ComponentActivity() {
    lateinit var isCreator: MutableState<Boolean>
@@ -235,9 +239,13 @@ fun EditorColumn(context: Context?,
          modifier = Modifier.fillMaxWidth()
       ) {
          TextField(
-            value = "${chosenProject.value.name} (color #${chosenProject.value.color})",
+            value = chosenProject.value.name,
             onValueChange = {},
             readOnly = true,
+            leadingIcon = {
+//               Icon(imageVector = Icons.Filled.Circle, contentDescription = null, tint = Color(colors.red, colors.green, colors.blue))
+            },
+
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isProjectDropdownExpanded.value) },
             colors = ExposedDropdownMenuDefaults.textFieldColors(),
             modifier = Modifier
@@ -251,14 +259,20 @@ fun EditorColumn(context: Context?,
             modifier = Modifier.fillMaxWidth()
          ) {
             projects.forEach { project ->
+               val colors = ColorEntity()
+               colors.buildByHex(project.color)
+
                DropdownMenuItem(
                   text = {
-                     Text(text = "${project.name} (color #${project.color})")
+                     Text(text = project.name)
                   },
                   modifier = Modifier.fillMaxWidth(),
                   onClick = {
                      chosenProject.value = project
                      isProjectDropdownExpanded.value = false
+                  },
+                  leadingIcon = {
+                     Icon(imageVector = Icons.Filled.Circle, contentDescription = null, tint = Color(colors.red, colors.green, colors.blue))
                   }
                )
             }
@@ -293,7 +307,7 @@ fun DateDialog(confirmText: String = "Ok", onDismissRequest: (Long?) -> Unit, re
    val now = if(reminder.notificationDate == null) Time.from(Instant.now()).time else reminder.notificationDate
 
    //TODO: Remove hardcoded range
-   val datePickerState = DatePickerState(now, now, IntRange(2024, 2025), DisplayMode.Picker)
+   val datePickerState = DatePickerState(Locale.getDefault(), now)
 
    DatePickerDialog(
       onDismissRequest = { onDismissRequest(datePickerState.selectedDateMillis) },

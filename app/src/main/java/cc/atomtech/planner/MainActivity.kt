@@ -92,12 +92,11 @@ class MainActivity : ComponentActivity() {
       }
 
       var reminders: MutableList<Reminder>? = null
+      var projects: MutableList<Project> = mutableListOf()
 
       GlobalScope.launch {
          reminders = (DB.getRemindersDAO()?.readAll())?.toMutableList()
-
-
-
+         projects = (DB.getProjectsDAO()?.readAll())?.toMutableList()!!
       }
 
 
@@ -147,7 +146,8 @@ class MainActivity : ComponentActivity() {
                   paddingValues = it,
                   context = this,
                   reminders = reminders,
-                  mutableReminders = mutableReminders
+                  mutableReminders = mutableReminders,
+                  mutableProjcets = projects
                )}
             )
          }
@@ -192,6 +192,7 @@ fun Navbar(navController: NavHostController, navItems: List<NavbarItem>) {
 fun ContentController(navController: NavHostController,
                       reminders: MutableList<Reminder>?,
                       mutableReminders: MutableList<Reminder>?,
+                      mutableProjcets: MutableList<Project>,
                       paddingValues: PaddingValues,
                       context: Context?) {
    NavHost(
@@ -206,7 +207,7 @@ fun ContentController(navController: NavHostController,
             Labels()
          }
          composable(route = "projects") {
-            Projects()
+            Projects(projects = mutableProjcets)
          }
       }
    )
@@ -291,7 +292,8 @@ fun AppPreview() {
          paddingValues = it,
          reminders = null,
          mutableReminders = null,
-         context = null
+         context = null,
+         mutableProjcets = mutableListOf()
       ) }
    )
 }

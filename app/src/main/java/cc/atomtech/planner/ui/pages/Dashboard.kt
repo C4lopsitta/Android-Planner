@@ -79,7 +79,8 @@ fun Dashboard(context: Context?,
                val item = reminders?.get(it) ?: Reminder()
                ReminderRow(context = context, reminder = item)
             }
-         })
+         }
+      )
    }
 }
 

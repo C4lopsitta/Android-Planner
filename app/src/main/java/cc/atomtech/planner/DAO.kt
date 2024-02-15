@@ -82,7 +82,6 @@ class DB() {
             db = Room.databaseBuilder(context, DAO::class.java, "planner_db")
                .fallbackToDestructiveMigration()
                .fallbackToDestructiveMigrationOnDowngrade()
-               .fallbackToDestructiveMigration()
                .build()
             return
          }
