@@ -29,4 +29,7 @@
     <string name="wrong_install_body">The app has been installed but the necessary data was not found. Try to reinstall. If this error reappers, please make an Issue on the GitHub page.</string>
     <string name="wrong_install_close">Close app</string>
     <string name="wrong_install_make_issue">Open GitHub page</string>
+    <string name="activity_project_create">project_create</string>
+    <string name="fab_add_project_label">Create Project</string>
+    <string name="word_project">Project</string>
 </resources>

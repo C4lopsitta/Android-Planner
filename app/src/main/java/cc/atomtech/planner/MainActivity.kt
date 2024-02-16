@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Bento
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.AlertDialog
@@ -33,6 +34,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -111,6 +113,10 @@ class MainActivity : ComponentActivity() {
 
             val useSearchTopBar = remember { mutableStateOf(false) }
 
+            val isInProjects = remember {
+               mutableStateOf(navController.currentBackStackEntry?.destination?.route == NavbarItem.list[1].route)
+            }
+
             LaunchedEffect(Unit) {
                useSearchTopBar.value =
                   AppPreferences.readBoolean(this@MainActivity, "useSearchTopBar")
@@ -156,9 +162,19 @@ class MainActivity : ComponentActivity() {
                },
                floatingActionButton = {
                   ExtendedFloatingActionButton(
-                     onClick = { fabOnClick() },
-                     text = { Text(text = getString(R.string.fab_add_label)) },
-                     icon = { Icon(Icons.Rounded.Add, getString(R.string.fab_add_label)) },
+                     onClick = { fabOnClick(isInProjects) },
+                     text = {
+                        if(isInProjects.value)
+                           Text(text = getString(R.string.fab_add_project_label))
+                        else
+                           Text(text = getString(R.string.fab_add_label))
+                     },
+                     icon = {
+                        if(isInProjects.value)
+                           Icon(Icons.Rounded.Bento, getString(R.string.fab_add_project_label))
+                        else
+                           Icon(Icons.Rounded.Add, getString(R.string.fab_add_label))
+                     },
                      shape = FloatingActionButtonDefaults.extendedFabShape
                   )
                },
@@ -170,6 +186,7 @@ class MainActivity : ComponentActivity() {
                      context = this,
                      reminders = reminders,
                      mutableReminders = mutableReminders,
+                     isInProject = isInProjects,
                      mutableProjcets = projects
                   )
                   if(projects.size == 0)
@@ -196,10 +213,15 @@ class MainActivity : ComponentActivity() {
          }
    }
 
-   private fun fabOnClick() {
-      startActivity(
-         Intent(this@MainActivity, EditorActivity::class.java).putExtra("isCreator", true)
-      )
+   private fun fabOnClick(isInProject: MutableState<Boolean>) {
+      if(isInProject.value)
+         startActivity(
+            Intent(this@MainActivity, ProjectEditorActivity::class.java).putExtra("isCreator", true)
+         )
+      else
+         startActivity(
+            Intent(this@MainActivity, EditorActivity::class.java).putExtra("isCreator", true)
+         )
    }
 }
 
@@ -235,6 +257,7 @@ fun ContentController(navController: NavHostController,
                       reminders: MutableList<Reminder>?,
                       mutableReminders: MutableList<Reminder>?,
                       mutableProjcets: MutableList<Project>,
+                      isInProject: MutableState<Boolean>,
                       paddingValues: PaddingValues,
                       context: Context?) {
    NavHost(
@@ -243,12 +266,15 @@ fun ContentController(navController: NavHostController,
       modifier = Modifier.padding(paddingValues = paddingValues),
       builder = {
          composable(route = "home") {
+            isInProject.value = false
             Dashboard(context = context, reminders = mutableReminders)
          }
          composable(route = "labels") {
+            isInProject.value = false
             Labels()
          }
          composable(route = "projects") {
+            isInProject.value = true
             Projects(projects = mutableProjcets)
          }
       }
@@ -335,6 +361,7 @@ fun AppPreview() {
          reminders = null,
          mutableReminders = null,
          context = null,
+         isInProject = mutableStateOf(false),
          mutableProjcets = mutableListOf()
       ) }
    )

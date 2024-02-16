@@ -39,15 +39,33 @@ import kotlinx.coroutines.launch
 @Entity(tableName = "projects")
 data class Project(
    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "rowid") var id: Long = 0,
-   @ColumnInfo()                    var name: String,
-   @ColumnInfo()                    var color: String,
-   @ColumnInfo()                    var isImportant: Boolean,
+   @ColumnInfo()                    var name: String = "",
+   @ColumnInfo()                    var color: String = "ffffff",
+   @ColumnInfo()                    var isImportant: Boolean = false,
    @ColumnInfo()                    var reminderCount: Int = 0,
 ) {
    fun loadCount() {
       GlobalScope.launch {
          val count = (DB.getRemindersDAO()?.countRemindersInProject((this@Project).id)) ?: 0
          reminderCount = count
+      }
+   }
+
+   fun store() {
+      GlobalScope.launch {
+         DB.getProjectsDAO()?.create(this@Project)
+      }
+   }
+
+   fun update() {
+      GlobalScope.launch {
+         DB.getProjectsDAO()?.update(this@Project)
+      }
+   }
+
+   fun delete() {
+      GlobalScope.launch {
+         DB.getProjectsDAO()?.delete(this@Project)
       }
    }
 }

@@ -32,6 +32,11 @@
             android:name=".EditorActivity"
             android:theme="@style/Theme.Planner"
             android:label="@string/activity_create"/>
+
+        <activity
+            android:name=".ProjectEditorActivity"
+            android:theme="@style/Theme.Planner"
+            android:label="@string/activity_project_create"/>
     </application>
 
 </manifest>
