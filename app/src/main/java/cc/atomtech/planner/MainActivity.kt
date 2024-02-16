@@ -86,9 +86,6 @@ class MainActivity : ComponentActivity() {
          DB.getProjectsDAO()?.create(Project(name = "Default project", color = "ffffff", isImportant = false))
 
          val projects = DB.getProjectsDAO()?.readAll()
-         projects?.forEach { project ->
-            Log.i("PROJECTS", "--> ${project.toString()}")
-         }
 
          //Todo)) Add some default reminders
 
@@ -105,98 +102,93 @@ class MainActivity : ComponentActivity() {
 
       super.onCreate(savedInstanceState)
 
-      if(projects.size == 0)
-         setContent {
-            PlannerTheme {
-               AlertDialog(
-                  onDismissRequest = {},
-                  confirmButton = { Button(onClick = {
-                     exitProcess(0)
-                  }) {
-                     Text(text = getString(R.string.wrong_install_close))
-                  } },
-                  dismissButton = { Button(onClick = {
-                     val uri = Uri.parse("https://github.com/c4lopsitta/Android-Planner/issues")
-                     val intent = Intent(Intent.ACTION_VIEW, uri)
-                     startActivity(intent)
-                  }) {
-                     Text(text = getString(R.string.wrong_install_make_issue))
-                  }},
-                  title = { Text(text = getString(R.string.wrong_install_title)) },
-                  text = { Text(text = getString(R.string.wrong_install_body)) }
-               )
+      setContent {
+         PlannerTheme {
+            val navController = rememberNavController()
+            val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+
+            val mutableReminders = remember { reminders }
+
+            val useSearchTopBar = remember { mutableStateOf(false) }
+
+            LaunchedEffect(Unit) {
+               useSearchTopBar.value =
+                  AppPreferences.readBoolean(this@MainActivity, "useSearchTopBar")
             }
-         }
-      else
-         setContent {
-            PlannerTheme {
-               val navController = rememberNavController()
-               val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
-               val mutableReminders = remember { reminders }
-
-               val useSearchTopBar = remember { mutableStateOf(false) }
-
-               LaunchedEffect(Unit) {
-                  useSearchTopBar.value =
-                     AppPreferences.readBoolean(this@MainActivity, "useSearchTopBar")
-               }
-
-               // A surface container using the 'background' color from the theme
-               Scaffold(
-                  topBar = {
-                     if (useSearchTopBar.value)
-                        SearchBar(context = this@MainActivity)
-                     else
-                        CenterAlignedTopAppBar(
-                           title = {
-                              Text(
-                                 text = getString(R.string.app_name),
-                                 maxLines = 1,
-                                 overflow = TextOverflow.Ellipsis
+            // A surface container using the 'background' color from the theme
+            Scaffold(
+               topBar = {
+                  if (useSearchTopBar.value)
+                     SearchBar(context = this@MainActivity)
+                  else
+                     CenterAlignedTopAppBar(
+                        title = {
+                           Text(
+                              text = getString(R.string.app_name),
+                              maxLines = 1,
+                              overflow = TextOverflow.Ellipsis
+                           )
+                        },
+                        actions = {
+                           IconButton(onClick = {
+                              startActivity(
+                                 Intent(
+                                    this@MainActivity,
+                                    SettingsActivity::class.java
+                                 )
                               )
-                           },
-                           actions = {
-                              IconButton(onClick = {
-                                 startActivity(
-                                    Intent(
-                                       this@MainActivity,
-                                       SettingsActivity::class.java
-                                    )
-                                 )
-                              }) {
-                                 Icon(
-                                    imageVector = Icons.Rounded.Settings,
-                                    contentDescription = getString(R.string.btn_settings_desc)
-                                 )
-                              }
-                           },
-                           scrollBehavior = scrollBehavior
-                        )
-                  },
-                  bottomBar = {
-                     Navbar(
-                        navController = navController,
-                        navItems = NavbarItem.BuildList(this)
+                           }) {
+                              Icon(
+                                 imageVector = Icons.Rounded.Settings,
+                                 contentDescription = getString(R.string.btn_settings_desc)
+                              )
+                           }
+                        },
+                        scrollBehavior = scrollBehavior
                      )
-                  },
-                  floatingActionButton = {
-                     ExtendedFloatingActionButton(
-                        onClick = { fabOnClick() },
-                        text = { Text(text = getString(R.string.fab_add_label)) },
-                        icon = { Icon(Icons.Rounded.Add, getString(R.string.fab_add_label)) },
-                        shape = FloatingActionButtonDefaults.extendedFabShape
-                     )
-                  },
-                  floatingActionButtonPosition = FabPosition.End,
-                  content = {
-                     ContentController(
-                        navController = navController,
-                        paddingValues = it,
-                        context = this,
-                        reminders = reminders,
-                        mutableReminders = mutableReminders,
-                        mutableProjcets = projects
+               },
+               bottomBar = {
+                  Navbar(
+                     navController = navController,
+                     navItems = NavbarItem.BuildList(this)
+                  )
+               },
+               floatingActionButton = {
+                  ExtendedFloatingActionButton(
+                     onClick = { fabOnClick() },
+                     text = { Text(text = getString(R.string.fab_add_label)) },
+                     icon = { Icon(Icons.Rounded.Add, getString(R.string.fab_add_label)) },
+                     shape = FloatingActionButtonDefaults.extendedFabShape
+                  )
+               },
+               floatingActionButtonPosition = FabPosition.End,
+               content = {
+                  ContentController(
+                     navController = navController,
+                     paddingValues = it,
+                     context = this,
+                     reminders = reminders,
+                     mutableReminders = mutableReminders,
+                     mutableProjcets = projects
+                  )
+                  if(projects.size == 0)
+                     AlertDialog(
+                        onDismissRequest = {},
+                        confirmButton = { Button(onClick = {
+                           exitProcess(0)
+                        }) {
+                           Text(text = getString(R.string.wrong_install_close))
+                        } },
+                        dismissButton = { Button(onClick = {
+                           val uri = Uri.parse("https://github.com/c4lopsitta/Android-Planner/issues")
+                           val intent = Intent(Intent.ACTION_VIEW, uri)
+                           startActivity(intent)
+                        }) {
+                           Text(text = getString(R.string.wrong_install_make_issue))
+                        }},
+                        title = { Text(text = getString(R.string.wrong_install_title)) },
+                        text = { Text(text = getString(R.string.wrong_install_body)) }
                      )
                   }
                )

@@ -44,6 +44,9 @@ interface ProjectsDAO {
 
    @Delete
    fun delete(project: Project)
+
+   @Query("DELETE FROM projects")
+   fun deleteAll()
 }
 
 class Converters {
