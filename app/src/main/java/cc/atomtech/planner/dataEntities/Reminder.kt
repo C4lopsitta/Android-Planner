@@ -3,6 +3,8 @@ package cc.atomtech.planner.dataEntities
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
@@ -19,6 +21,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -29,6 +33,7 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import cc.atomtech.planner.DB
 import cc.atomtech.planner.EditorActivity
+import cc.atomtech.planner.R
 import cc.atomtech.planner.Values
 import cc.atomtech.planner.ui.theme.PlannerTheme
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -113,18 +118,26 @@ data class Reminder (
    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun ReminderRow(context: Context?, reminder: Reminder) {
+fun ReminderRow(context: Context?, reminder: Reminder, onLongClick: (Reminder) -> Unit) {
+   val haptics = LocalHapticFeedback.current
    OutlinedCard(
-      onClick = {
-         val intent = Intent(context, EditorActivity::class.java)
-            .putExtra("isCreator", false)
-            .putExtra("rowid", reminder.id)
-         context?.startActivity(intent)
-      },
       modifier = Modifier
-         .fillMaxWidth(),
+         .fillMaxWidth()
+         .combinedClickable (
+            onClick = {
+               val intent = Intent(context, EditorActivity::class.java)
+                  .putExtra("isCreator", false)
+                  .putExtra("rowid", reminder.id)
+               context?.startActivity(intent)
+            },
+            onLongClick = {
+               haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+               onLongClick(reminder)
+            },
+            onLongClickLabel = context?.getString(R.string.long_press_label) ?: ""
+         ),
       shape = CardDefaults.outlinedShape,
       border = BorderStroke(width = 0.dp, color = Color.Transparent)
    ) {
@@ -159,6 +172,6 @@ fun ReminderRow(context: Context?, reminder: Reminder) {
 fun ReminderRowPreview() {
    val reminder = Reminder(isCompleted = true, title = "Lorem ipsum", notificationDate = Time.from(Instant.now()).time)
    PlannerTheme {
-      ReminderRow(context = null, reminder = reminder)
+      ReminderRow(context = null, reminder = reminder) {}
    }
 }

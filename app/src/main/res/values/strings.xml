@@ -34,4 +34,8 @@
     <string name="word_project">Project</string>
     <string name="word_color">Color</string>
     <string name="project_title">Project Name</string>
+    <string name="long_press_label">More options</string>
+    <string name="reminder_sheet_edit">Edit reminder</string>
+    <string name="reminder_sheet_share">Share reminder</string>
+    <string name="reminder_sheet_delete">Delete reminder</string>
 </resources>

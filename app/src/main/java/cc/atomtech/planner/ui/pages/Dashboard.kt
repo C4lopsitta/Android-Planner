@@ -1,6 +1,7 @@
 package cc.atomtech.planner.ui.pages
 
 import android.content.Context
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -23,6 +24,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,6 +33,7 @@ import cc.atomtech.planner.dataEntities.ButtonData
 import cc.atomtech.planner.R
 import cc.atomtech.planner.dataEntities.Reminder
 import cc.atomtech.planner.dataEntities.ReminderRow
+import cc.atomtech.planner.ui.components.ReminderSheet
 import cc.atomtech.planner.ui.theme.PlannerTheme
 
 class DashboardCompanion(context: Context?) {
@@ -53,6 +57,7 @@ class DashboardCompanion(context: Context?) {
 fun Dashboard(context: Context?,
               reminders: MutableList<Reminder>?) {
    val dashCompanion = DashboardCompanion(context)
+   val selectedReminder = remember { mutableStateOf<Reminder?>(null) }
 
    Column (
       modifier = Modifier
@@ -77,11 +82,18 @@ fun Dashboard(context: Context?,
          content = {
             items(count = reminders?.size ?: 0, key = null) {
                val item = reminders?.get(it) ?: Reminder()
-               ReminderRow(context = context, reminder = item)
+               ReminderRow(context = context, reminder = item) { selectedReminder.value = it }
             }
          }
       )
    }
+   if(selectedReminder.value != null)
+      ReminderSheet(
+         context = context,
+         reminder = selectedReminder.value!!
+      ) {
+         selectedReminder.value = null
+      }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
