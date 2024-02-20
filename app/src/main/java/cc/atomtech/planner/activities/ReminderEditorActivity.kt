@@ -182,11 +182,13 @@ fun EditorColumn(context: Context?,
    val title = remember { mutableStateOf(reminder.value.title) }
    val notifies = remember { mutableStateOf(false) }
    val isProjectDropdownExpanded = remember { mutableStateOf(false) }
-   val chosenProject = remember {
-      if(reminder.value.id == null)
-         mutableStateOf(projects[0])
-      else
-         mutableStateOf(projects[((reminder.value.projectIdentifier ?: 1) - 1).toInt()])
+
+   //TODO)) Fix preselected project
+   val chosenProject = remember { mutableStateOf(projects[0])
+//      if(reminder.value.id == null)
+//         mutableStateOf(projects[0])
+//      else
+//         mutableStateOf(projects[((reminder.value.projectIdentifier ?: 1) - 1).toInt()])
    }
 
    Column (
@@ -254,7 +256,13 @@ fun EditorColumn(context: Context?,
             onValueChange = {},
             readOnly = true,
             leadingIcon = {
-//               Icon(imageVector = Icons.Filled.Circle, contentDescription = null, tint = Color(colors.red, colors.green, colors.blue))
+               val colors = ColorEntity()
+               colors.buildByHex(chosenProject.value.color)
+               Icon(
+                  imageVector = Icons.Filled.Circle,
+                  contentDescription = null,
+                  tint = Color(colors.red, colors.green, colors.blue)
+               )
             },
 
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isProjectDropdownExpanded.value) },
@@ -280,6 +288,7 @@ fun EditorColumn(context: Context?,
                   modifier = Modifier.fillMaxWidth(),
                   onClick = {
                      chosenProject.value = project
+                     reminder.value.projectIdentifier = project.id
                      isProjectDropdownExpanded.value = false
                   },
                   leadingIcon = {

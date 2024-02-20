@@ -15,7 +15,7 @@ interface RemindersDAO {
    @Query("SELECT * FROM reminders")
    suspend fun readAll(): List<Reminder>
 
-   @Query("SELECT COUNT(*) FROM reminders WHERE projectIdentifier = :project")
+   @Query("SELECT count(*) FROM reminders WHERE projectIdentifier = :project")
    suspend fun countRemindersInProject(project: Long): Int
 
    @Query("DELETE FROM reminders WHERE projectIdentifier = :project")
