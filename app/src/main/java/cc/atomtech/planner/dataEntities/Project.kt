@@ -1,23 +1,18 @@
 package cc.atomtech.planner.dataEntities
 
-import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,11 +22,8 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.Fts4
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import cc.atomtech.planner.DB
-import cc.atomtech.planner.EditorActivity
 import cc.atomtech.planner.ui.theme.PlannerTheme
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -89,6 +81,7 @@ fun ProjectRow(project: Project) {
          modifier = Modifier.defaultMinSize(minHeight = 80.dp)
       ) {
          val colorEntity = ColorEntity()
+         colorEntity.buildByHex(project.color)
          Icon(
             modifier = Modifier.width(60.dp),
             imageVector = Icons.Filled.Circle,

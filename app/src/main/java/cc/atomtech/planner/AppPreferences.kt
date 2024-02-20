@@ -1,17 +1,11 @@
 package cc.atomtech.planner
 
 import android.content.Context
-import android.util.Log
-import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import com.google.gson.Gson
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import java.lang.reflect.Type
 
 class AppPreferences {
    companion object {

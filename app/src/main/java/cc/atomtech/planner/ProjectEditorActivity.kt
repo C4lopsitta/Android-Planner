@@ -9,14 +9,22 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Save
 import androidx.compose.material.icons.rounded.TextFields
 import androidx.compose.material.icons.rounded.Update
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -32,9 +40,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import cc.atomtech.planner.dataEntities.ColorEntity
 import cc.atomtech.planner.dataEntities.Project
 import cc.atomtech.planner.ui.theme.PlannerTheme
+import com.github.skydoves.colorpicker.compose.BrightnessSlider
+import com.github.skydoves.colorpicker.compose.ColorPickerController
+import com.github.skydoves.colorpicker.compose.HsvColorPicker
+import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -79,7 +94,7 @@ class ProjectEditorActivity : ComponentActivity() {
                            navigateUpTo(Intent(this@ProjectEditorActivity, MainActivity::class.java))
                         }) {
                            Icon(
-                              imageVector = Icons.Rounded.ArrowBack,
+                              imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                               contentDescription = getString(R.string.btn_back_desc)
                            )
                         }
@@ -130,6 +145,12 @@ fun EditorColumn(context: Context?,
                  project: MutableState<Project>) {
    val title = remember { mutableStateOf(project.value.name) }
    val color = remember { mutableStateOf(project.value.color) }
+   val colorEntity = remember { mutableStateOf(ColorEntity()) }
+   colorEntity.value.buildByHex(color.value)
+   val isDialogOpen = remember { mutableStateOf(false) }
+   val colorControler = rememberColorPickerController()
+   colorControler.setDebounceDuration(300L)
+//   colorControler.setWheelColor()
 
    Column (
       modifier = Modifier
@@ -143,8 +164,75 @@ fun EditorColumn(context: Context?,
          value = title,
          onValueChanged = {title.value = it; project.value.name = it},
          icon = Icons.Rounded.TextFields,
+         singleLine = true,
          context = context
       )
+      Row (
+         modifier = Modifier
+            .fillMaxWidth()
+            .padding(12.dp),
+         horizontalArrangement = Arrangement.SpaceBetween,
+         verticalAlignment = Alignment.CenterVertically
+      ) {
+         Text(text = context?.getString(R.string.word_color) ?: "Color")
+         Icon(
+            imageVector = Icons.Filled.Circle,
+            contentDescription = "",
+            tint = Color(colorEntity.value.red, colorEntity.value.green, colorEntity.value.blue)
+         )
+         IconButton(onClick = { isDialogOpen.value = true }) {
+            Icon(imageVector = Icons.Rounded.Edit, contentDescription = context?.getString(R.string.word_edit))
+         }
+      }
+      if(isDialogOpen.value)
+         ColorDialog(
+            controller = colorControler,
+            onDismissRequest = { isDialogOpen.value = false },
+            onConfirm = { hex ->
+               color.value = hex
+               colorEntity.value.buildByHex(hex)
+               project.value.color = hex
+               isDialogOpen.value = false
+            }
+         )
    }
 }
 
+@Composable
+fun ColorDialog(controller: ColorPickerController, onDismissRequest: () -> Unit, onConfirm: (hex: String) -> Unit) {
+   var color = "ffffff"
+
+   Dialog(onDismissRequest = onDismissRequest) {
+      Card (
+         modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+         shape = RoundedCornerShape(16.dp)
+      ) {
+         HsvColorPicker(
+            modifier = Modifier
+               .fillMaxWidth()
+               .padding(8.dp)
+               .height(300.dp),
+            controller = controller,
+            onColorChanged = { color = it.hexCode.substring(2, 8) }
+         )
+         BrightnessSlider(
+            modifier = Modifier.fillMaxWidth().padding(10.dp).height(35.dp),
+            controller = controller
+         )
+         Row (
+            modifier = Modifier.padding(16.dp),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+         ) {
+            Button(onClick = onDismissRequest) {
+               Text(text = "Cancel")
+            }
+            Button(onClick = { onConfirm(color) }) {
+               Text(text = "Confirm")
+            }
+         }
+      }
+   }
+}

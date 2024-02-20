@@ -36,6 +36,9 @@ interface ProjectsDAO {
    @Query("SELECT * FROM projects")
    suspend fun readAll(): List<Project>
 
+   @Query("UPDATE projects SET color = 'ffffff' WHERE length(color) < 6")
+   fun fixColors()
+
    @Insert
    fun create(project: Project): Long
 

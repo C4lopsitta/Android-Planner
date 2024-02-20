@@ -6,9 +6,9 @@ data class ColorEntity(
    var blue: Int = 0
 ) {
    fun buildByHex(hex: String) {
-      this.red = hex.subSequence(0, 1).toString().toInt(radix = 16)
-      this.green = hex.subSequence(2, 3).toString().toInt(radix = 16)
-      this.blue = hex.subSequence(4, 5).toString().toInt(radix = 16)
+      this.red = hex.substring(0, 2).toInt(radix = 16)
+      this.green = hex.substring(2, 4).toInt(radix = 16)
+      this.blue = hex.substring(4, 6).toInt(radix = 16)
    }
 
    fun getHexString(): String {

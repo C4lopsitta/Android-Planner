@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,13 +18,17 @@ fun Projects(projects: MutableList<Project>) {
    Column (
       modifier = Modifier.fillMaxSize()
    ) {
-      Text(text = "Projects")
+//      Text(text = "Projects")
       LazyColumn(
          verticalArrangement = Arrangement.spacedBy(8.dp),
          contentPadding = PaddingValues(12.dp),
          content = {
             items(count = projects.size, key = null) { index ->
                val item = projects[index]
+               if(item.color.length < 6) {
+                  item.color = "ffffff"
+               }
+
                item.loadCount()
                ProjectRow(project = item)
             }

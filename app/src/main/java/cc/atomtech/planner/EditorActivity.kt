@@ -29,7 +29,6 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerState
-import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -272,7 +271,11 @@ fun EditorColumn(context: Context?,
                      isProjectDropdownExpanded.value = false
                   },
                   leadingIcon = {
-                     Icon(imageVector = Icons.Filled.Circle, contentDescription = null, tint = Color(colors.red, colors.green, colors.blue))
+                     Icon(
+                        imageVector = Icons.Filled.Circle,
+                        contentDescription = null,
+                        tint = Color(colors.red, colors.green, colors.blue)
+                     )
                   }
                )
             }
@@ -289,6 +292,7 @@ fun EditorColumn(context: Context?,
 fun SpanningTextField(value: MutableState<String>,
                       onValueChanged: (String) -> Unit,
                       icon: ImageVector,
+                      singleLine: Boolean = false,
                       context: Context?) {
    OutlinedTextField(
       value = value.value,
@@ -297,7 +301,8 @@ fun SpanningTextField(value: MutableState<String>,
       label = { Text(text = context?.getString(R.string.txt_reminder_title) ?: "Title") },
       leadingIcon = { Icon(imageVector = icon, contentDescription = context?.getString(R.string.txt_reminder_title) ?: "Title") },
       modifier = Modifier
-         .fillMaxWidth()
+         .fillMaxWidth(),
+      singleLine = singleLine
    )
 }
 

@@ -18,6 +18,7 @@ import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,8 +48,6 @@ import androidx.compose.ui.unit.dp
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -99,6 +98,7 @@ class MainActivity : ComponentActivity() {
 
       GlobalScope.launch {
          reminders = (DB.getRemindersDAO()?.readAll())?.toMutableList()
+         DB.getProjectsDAO()?.fixColors()
          projects = (DB.getProjectsDAO()?.readAll())?.toMutableList()!!
       }
 
@@ -197,11 +197,15 @@ class MainActivity : ComponentActivity() {
                         }) {
                            Text(text = getString(R.string.wrong_install_close))
                         } },
-                        dismissButton = { Button(onClick = {
-                           val uri = Uri.parse("https://github.com/c4lopsitta/Android-Planner/issues")
-                           val intent = Intent(Intent.ACTION_VIEW, uri)
-                           startActivity(intent)
-                        }) {
+                        dismissButton = {
+                           Button(
+                              onClick = {
+                                 val uri = Uri.parse("https://github.com/c4lopsitta/Android-Planner/issues")
+                                 val intent = Intent(Intent.ACTION_VIEW, uri)
+                                 startActivity(intent)
+                              },
+                              colors = ButtonDefaults.outlinedButtonColors()
+                        ) {
                            Text(text = getString(R.string.wrong_install_make_issue))
                         }},
                         title = { Text(text = getString(R.string.wrong_install_title)) },
