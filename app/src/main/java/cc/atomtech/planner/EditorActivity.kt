@@ -56,6 +56,7 @@ import cc.atomtech.planner.dataEntities.ColorEntity
 import cc.atomtech.planner.dataEntities.Project
 import cc.atomtech.planner.dataEntities.Reminder
 import cc.atomtech.planner.ui.components.IconText
+import cc.atomtech.planner.ui.components.SpanningTextField
 import cc.atomtech.planner.ui.components.SwitchRow
 import cc.atomtech.planner.ui.theme.PlannerTheme
 import kotlinx.coroutines.GlobalScope
@@ -193,7 +194,13 @@ fun EditorColumn(context: Context?,
       verticalArrangement = Arrangement.spacedBy(16.dp),
       horizontalAlignment = Alignment.CenterHorizontally
    ) {
-      SpanningTextField(value = title, onValueChanged = {title.value = it; reminder.value.title = it}, icon = Icons.Rounded.TextFields, context = context)
+      SpanningTextField(
+         value = title,
+         onValueChanged = {title.value = it; reminder.value.title = it},
+         placeholder = context?.getString(R.string.txt_reminder_title) ?: "",
+         label = context?.getString(R.string.txt_reminder_title) ?: "",
+         leadingIcon = { Icon(imageVector = Icons.Rounded.TextFields, contentDescription = null) }
+      )
       Row(
          modifier = Modifier
             .fillMaxWidth(),
@@ -286,25 +293,6 @@ fun EditorColumn(context: Context?,
    }
 }
 
-
-// TODO: pullup text labels
-@Composable
-fun SpanningTextField(value: MutableState<String>,
-                      onValueChanged: (String) -> Unit,
-                      icon: ImageVector,
-                      singleLine: Boolean = false,
-                      context: Context?) {
-   OutlinedTextField(
-      value = value.value,
-      onValueChange = onValueChanged,
-      placeholder = { Text(text = context?.getString(R.string.txt_reminder_title) ?: "Title") },
-      label = { Text(text = context?.getString(R.string.txt_reminder_title) ?: "Title") },
-      leadingIcon = { Icon(imageVector = icon, contentDescription = context?.getString(R.string.txt_reminder_title) ?: "Title") },
-      modifier = Modifier
-         .fillMaxWidth(),
-      singleLine = singleLine
-   )
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

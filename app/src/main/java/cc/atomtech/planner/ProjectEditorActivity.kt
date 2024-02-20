@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import cc.atomtech.planner.dataEntities.ColorEntity
 import cc.atomtech.planner.dataEntities.Project
+import cc.atomtech.planner.ui.components.SpanningTextField
 import cc.atomtech.planner.ui.theme.PlannerTheme
 import com.github.skydoves.colorpicker.compose.BrightnessSlider
 import com.github.skydoves.colorpicker.compose.ColorPickerController
@@ -163,9 +164,10 @@ fun EditorColumn(context: Context?,
       SpanningTextField(
          value = title,
          onValueChanged = {title.value = it; project.value.name = it},
-         icon = Icons.Rounded.TextFields,
+         leadingIcon = { Icon(imageVector = Icons.Rounded.TextFields, contentDescription = null ) },
          singleLine = true,
-         context = context
+         placeholder = context?.getString(R.string.project_title) ?: "",
+         label = context?.getString(R.string.project_title) ?: ""
       )
       Row (
          modifier = Modifier
