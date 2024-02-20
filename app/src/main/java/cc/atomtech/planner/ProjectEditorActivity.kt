@@ -140,6 +140,7 @@ class ProjectEditorActivity : ComponentActivity() {
    }
 }
 
+//TODO)) Add editor feature
 @Composable
 fun EditorColumn(context: Context?,
                  paddingValues: PaddingValues,

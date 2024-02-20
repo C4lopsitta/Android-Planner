@@ -279,7 +279,7 @@ fun ContentController(navController: NavHostController,
          }
          composable(route = "projects") {
             isInProject.value = true
-            Projects(projects = mutableProjcets)
+            Projects(projects = mutableProjcets, context = context)
          }
       }
    )

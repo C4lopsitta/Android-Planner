@@ -1,6 +1,12 @@
 package cc.atomtech.planner.dataEntities
 
+import android.content.Context
+import android.content.Intent
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
@@ -16,6 +22,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -24,6 +32,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import cc.atomtech.planner.DB
+import cc.atomtech.planner.ProjectEditorActivity
 import cc.atomtech.planner.ui.theme.PlannerTheme
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -62,17 +71,27 @@ data class Project(
    }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ProjectRow(project: Project) {
+fun ProjectRow(project: Project, context: Context?, onPressHold: (Project) -> Unit) {
+   val haptics = LocalHapticFeedback.current
+
    OutlinedCard(
-      onClick = {
-//         val intent = Intent(context, EditorActivity::class.java)
-//            .putExtra("isCreator", false)
-//            .putExtra("rowid", reminder.id)
-//         context?.startActivity(intent)
-      },
       modifier = Modifier
-         .fillMaxWidth(),
+         .fillMaxWidth()
+         .combinedClickable (
+            onClick = {
+               val intent = Intent(context, ProjectEditorActivity::class.java)
+               intent.putExtra("isCreator", false)
+               intent.putExtra("id", project.id)
+               context?.startActivity(intent)
+            },
+            onLongClick = {
+               haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+               onPressHold(project)
+            },
+            onLongClickLabel = ""
+         ),
       shape = CardDefaults.outlinedShape,
       border = BorderStroke(width = 0.dp, color = Color.Transparent)
    ) {
@@ -100,12 +119,4 @@ fun ProjectRow(project: Project) {
    }
 }
 
-@Preview()
-@Composable
-fun ProjectRowPreview() {
-   val project = Project(42, "Lorem Ipsum", "feba00", false)
-   PlannerTheme {
-      ProjectRow(project = project)
-   }
-}
 

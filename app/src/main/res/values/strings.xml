@@ -38,4 +38,12 @@
     <string name="reminder_sheet_edit">Edit reminder</string>
     <string name="reminder_sheet_share">Share reminder</string>
     <string name="reminder_sheet_delete">Delete reminder</string>
+    <string name="project_sheet_share">Share project</string>
+    <string name="project_sheet_delete">Delete project</string>
+    <string name="project_sheet_edit">Edit project</string>
+    <string name="project_sheet_delete_confirm_title">Are you sure?</string>
+    <string name="project_sheet_delete_confirm_text">You\'re about to delete the project %1$s, which contains %2$d reminders that will also be deleted with the project.</string>
+    <string name="project_sheet_delete_confirm_dismiss_button">No, don\'t delete</string>
+    <string name="project_sheet_delete_confirm_confirm_button">Yes, delete the project</string>
+    <string name="project_sheet_empty">Delete reminders</string>
 </resources>
