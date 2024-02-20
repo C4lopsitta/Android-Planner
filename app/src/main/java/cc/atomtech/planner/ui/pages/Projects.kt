@@ -36,7 +36,9 @@ fun Projects(projects: MutableList<Project>, context: Context?) {
                }
 
                item.loadCount()
-               ProjectRow(project = item, context = context) { selectedProject.value = it }
+               ProjectRow(project = item, context = context) {
+                  selectedProject.value = it
+               }
             }
       })
    }
@@ -45,7 +47,9 @@ fun Projects(projects: MutableList<Project>, context: Context?) {
       ProjectSheet(
          context = context,
          project = selectedProject.value!!
-      ) {
+      ) { deletedProject ->
+         if(deletedProject != null)
+            projects.remove(deletedProject)
          selectedProject.value = null
       }
 }

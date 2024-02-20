@@ -44,6 +44,8 @@
     <string name="project_sheet_delete_confirm_title">Are you sure?</string>
     <string name="project_sheet_delete_confirm_text">You\'re about to delete the project %1$s, which contains %2$d reminders that will also be deleted with the project.</string>
     <string name="project_sheet_delete_confirm_dismiss_button">No, don\'t delete</string>
-    <string name="project_sheet_delete_confirm_confirm_button">Yes, delete the project</string>
+    <string name="project_sheet_delete_confirm_confirm_button">Yes, delete the %1$s</string>
     <string name="project_sheet_empty">Delete reminders</string>
+    <string name="project_sheet_delete_reminders_confirm_text">You\'re about to delete %1$d reminders inside the project %2$s. This action is unreversable.</string>
+    <string name="word_reminders">Reminders</string>
 </resources>

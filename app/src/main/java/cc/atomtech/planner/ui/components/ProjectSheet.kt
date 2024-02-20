@@ -26,17 +26,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cc.atomtech.planner.DB
 import cc.atomtech.planner.R
 import cc.atomtech.planner.dataEntities.Project
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 //TODO)) Implement better buttons
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProjectSheet(context: Context?, project: Project, onDismiss: () -> Unit) {
-   val showDeleteDialog = remember { mutableStateOf(false) }
+fun ProjectSheet(context: Context?, project: Project, onDismiss: (deletedProject: Project?) -> Unit) {
+   val selectedDialog = remember { mutableStateOf(ProjectSheetSelectedDialog.NONE) }
 
    ModalBottomSheet (
-      onDismissRequest = onDismiss,
+      onDismissRequest = { onDismiss(null) },
       sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
       modifier = Modifier.padding(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding())
    ) {
@@ -61,7 +64,7 @@ fun ProjectSheet(context: Context?, project: Project, onDismiss: () -> Unit) {
       }
 
       TextButton(
-         onClick = {  },
+         onClick = { selectedDialog.value = ProjectSheetSelectedDialog.REMINDERS },
          modifier = Modifier
             .fillMaxWidth()
             .height(64.dp)
@@ -72,7 +75,7 @@ fun ProjectSheet(context: Context?, project: Project, onDismiss: () -> Unit) {
 
       if(project.id != 1L)
          TextButton(
-            onClick = { showDeleteDialog.value = true },
+            onClick = { selectedDialog.value = ProjectSheetSelectedDialog.PROJECT },
             modifier = Modifier
                .fillMaxWidth()
                .height(64.dp)
@@ -82,31 +85,81 @@ fun ProjectSheet(context: Context?, project: Project, onDismiss: () -> Unit) {
          }
    }
 
-   if(showDeleteDialog.value)
-      ProjectDeleteAlertDialog(
-         projectName = project.name,
-         projectReminders = project.reminderCount,
-         context = context,
-         onDismiss = { showDeleteDialog.value = false }
-      ) {
+   if(selectedDialog.value != ProjectSheetSelectedDialog.NONE)
+      if(selectedDialog.value == ProjectSheetSelectedDialog.PROJECT)
+         ProjectDeleteAlertDialog(
+            projectName = project.name,
+            projectReminders = project.reminderCount,
+            context = context,
+            onDismiss = { selectedDialog.value = ProjectSheetSelectedDialog.NONE }
+         ) {
+            GlobalScope.launch {
+               DB.getRemindersDAO()?.deleteInProject(project.id)
+               DB.getProjectsDAO()?.delete(project)
+            }
+            onDismiss(project)
+         }
+      else
+         ProjectDeleteRemindersAlertDialog(
+            projectName = project.name,
+            projectReminders = project.reminderCount,
+            context = context,
+            onDismiss = { selectedDialog.value = ProjectSheetSelectedDialog.NONE }
+         ) {
+            GlobalScope.launch {
+               DB.getRemindersDAO()?.deleteInProject(project.id)
+            }
+            onDismiss(null)
+         }
+}
 
-      }
+@Composable
+fun ProjectDeleteRemindersAlertDialog(projectName: String, projectReminders: Int, context: Context?, onDismiss: () -> Unit, onConfirm: () -> Unit) {
+   GenericProjectDeleteAlertDialog(
+      projectName = projectName,
+      projectReminders = projectReminders,
+      context = context,
+      confirmItem = context?.getString(R.string.word_reminders) ?: "",
+      textContent = context?.getString(R.string.project_sheet_delete_reminders_confirm_text, projectReminders, projectName) ?: "",
+      onDismiss = onDismiss
+   ) {
+      onConfirm()
+   }
 }
 
 @Composable
 fun ProjectDeleteAlertDialog(projectName: String, projectReminders: Int, context: Context?, onDismiss: () -> Unit, onConfirm: () -> Unit) {
+   GenericProjectDeleteAlertDialog(
+      projectName = projectName,
+      projectReminders = projectReminders,
+      context = context,
+      confirmItem = context?.getString(R.string.word_project) ?: "",
+      textContent = context?.getString(R.string.project_sheet_delete_confirm_text, projectName, projectReminders) ?: "",
+      onDismiss = onDismiss
+   ) {
+      onConfirm()
+   }
+}
+
+@Composable
+fun GenericProjectDeleteAlertDialog(projectName: String, projectReminders: Int, confirmItem: String, textContent: String, context: Context?, onDismiss: () -> Unit, onConfirm: () -> Unit) {
    AlertDialog(
       onDismissRequest = { onDismiss() },
       confirmButton = { OutlinedButton(
          onClick = { onConfirm() },
-         content = { Text(text = context?.getString(R.string.project_sheet_delete_confirm_confirm_button) ?: "") }
+         content = { Text(text = context?.getString(R.string.project_sheet_delete_confirm_confirm_button, confirmItem) ?: "") }
       ) },
       dismissButton = { Button(
          onClick = { onDismiss() },
          content = { Text(text = context?.getString(R.string.project_sheet_delete_confirm_dismiss_button) ?: "") }
       ) },
       title = { Text(text = context?.getString(R.string.project_sheet_delete_confirm_title) ?: "") },
-      text = { Text(text = context?.getString(R.string.project_sheet_delete_confirm_text, projectName, projectReminders) ?: "") }
+      text = { Text(text = textContent) }
    )
 }
 
+enum class ProjectSheetSelectedDialog {
+   NONE,
+   PROJECT,
+   REMINDERS
+}

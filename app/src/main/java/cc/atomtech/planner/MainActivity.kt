@@ -1,5 +1,6 @@
 package cc.atomtech.planner
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -64,7 +65,6 @@ import cc.atomtech.planner.ui.pages.Labels
 import cc.atomtech.planner.ui.pages.Projects
 import cc.atomtech.planner.ui.theme.PlannerTheme
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -89,7 +89,7 @@ class MainActivity : ComponentActivity() {
          // Create default project (id 1)
          DB.getProjectsDAO()?.create(Project(name = "Default project", color = "ffffff", isImportant = false))
 
-         val projects = DB.getProjectsDAO()?.readAll()
+//         val projects = DB.getProjectsDAO()?.readAll()
 
          //Todo)) Add some default reminders
 
@@ -187,7 +187,7 @@ class MainActivity : ComponentActivity() {
                      navController = navController,
                      paddingValues = it,
                      context = this,
-                     reminders = reminders,
+//                     reminders = reminders,
                      mutableReminders = mutableReminders,
                      isInProject = isInProjects,
                      mutableProjcets = projects
@@ -234,7 +234,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Navbar(navController: NavHostController, navItems: List<NavbarItem>) {
-   NavigationBar() {
+   NavigationBar {
       val currentNavEntry: String = navController.currentBackStackEntry?.destination?.route ?: "home"
       navItems.forEach { item ->
          NavigationBarItem(
@@ -261,7 +261,7 @@ fun Navbar(navController: NavHostController, navItems: List<NavbarItem>) {
 
 @Composable
 fun ContentController(navController: NavHostController,
-                      reminders: MutableList<Reminder>?,
+//                      reminders: MutableList<Reminder>?,
                       mutableReminders: MutableList<Reminder>?,
                       mutableProjcets: MutableList<Project>,
                       isInProject: MutableState<Boolean>,
@@ -288,7 +288,7 @@ fun ContentController(navController: NavHostController,
    )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(context: Context) {
    val searchQuery = remember { mutableStateOf("") }
@@ -347,7 +347,7 @@ fun SearchBar(context: Context) {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnrememberedMutableState")
 @Preview(showBackground = true, showSystemUi = true, backgroundColor = 0xFF000000)
 @Composable
 fun AppPreview() {
@@ -365,7 +365,7 @@ fun AppPreview() {
       content = { ContentController(
          navController = navController,
          paddingValues = it,
-         reminders = null,
+//         reminders = null,
          mutableReminders = null,
          context = null,
          isInProject = mutableStateOf(false),
