@@ -53,6 +53,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import cc.atomtech.planner.activities.EditorActivity
+import cc.atomtech.planner.activities.ProjectEditorActivity
+import cc.atomtech.planner.activities.SettingsActivity
 import cc.atomtech.planner.dataEntities.NavbarItem
 import cc.atomtech.planner.dataEntities.Project
 import cc.atomtech.planner.dataEntities.Reminder

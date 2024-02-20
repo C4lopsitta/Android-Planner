@@ -1,6 +1,7 @@
 package cc.atomtech.planner.ui.components
 
 import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
@@ -16,6 +17,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cc.atomtech.planner.activities.EditorActivity
 import cc.atomtech.planner.R
 import cc.atomtech.planner.dataEntities.Reminder
 
@@ -28,7 +30,12 @@ fun ReminderSheet(context: Context?, reminder: Reminder, onDismiss: () -> Unit) 
       sheetState = rememberModalBottomSheetState()
    ) {
       TextButton(
-         onClick = { /*TODO*/ },
+         onClick = {
+            val intent = Intent(context, EditorActivity::class.java)
+               .putExtra("isCreator", false)
+               .putExtra("rowid", reminder.id)
+            context?.startActivity(intent)
+         },
          modifier = Modifier
             .fillMaxWidth()
             .height(64.dp)

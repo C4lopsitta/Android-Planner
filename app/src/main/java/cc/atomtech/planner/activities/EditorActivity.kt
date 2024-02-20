@@ -1,4 +1,4 @@
-package cc.atomtech.planner
+package cc.atomtech.planner.activities
 
 import android.content.Context
 import android.content.Intent
@@ -36,7 +36,6 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -49,9 +48,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import cc.atomtech.planner.DB
+import cc.atomtech.planner.MainActivity
+import cc.atomtech.planner.R
 import cc.atomtech.planner.dataEntities.ColorEntity
 import cc.atomtech.planner.dataEntities.Project
 import cc.atomtech.planner.dataEntities.Reminder
@@ -147,7 +148,9 @@ class EditorActivity : ComponentActivity() {
                         imageVector = if(isCreator.value) Icons.Rounded.Save else Icons.Rounded.Update,
                         contentDescription = getString(R.string.fab_save_label)
                      ) },
-                     text = { Text(text = (if(isCreator.value) getString(R.string.fab_save_label) else getString(R.string.fab_update_label ))) }
+                     text = { Text(text = (if(isCreator.value) getString(R.string.fab_save_label) else getString(
+                        R.string.fab_update_label
+                     ))) }
                   )
                },
                content = {
@@ -229,7 +232,9 @@ fun EditorColumn(context: Context?,
          }
       }
 
-      SwitchRow(value = notifies, onValueChanged = {notifies.value = it; reminder.value.notifies = it}, label = context?.getString(R.string.lbl_recieve_notification) ?: "Receive a Notification")
+      SwitchRow(value = notifies, onValueChanged = {notifies.value = it; reminder.value.notifies = it}, label = context?.getString(
+         R.string.lbl_recieve_notification
+      ) ?: "Receive a Notification")
       if(notifies.value)
          IconText(
             imageVector = Icons.Rounded.Info,

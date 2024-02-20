@@ -32,7 +32,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import cc.atomtech.planner.DB
-import cc.atomtech.planner.EditorActivity
+import cc.atomtech.planner.activities.EditorActivity
 import cc.atomtech.planner.R
 import cc.atomtech.planner.Values
 import cc.atomtech.planner.ui.theme.PlannerTheme

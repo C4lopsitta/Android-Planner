@@ -1,4 +1,4 @@
-package cc.atomtech.planner
+package cc.atomtech.planner.activities
 
 import android.content.Context
 import android.content.Intent
@@ -32,6 +32,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import cc.atomtech.planner.AppPreferences
+import cc.atomtech.planner.MainActivity
+import cc.atomtech.planner.R
 import cc.atomtech.planner.ui.components.SwitchRow
 import cc.atomtech.planner.ui.theme.PlannerTheme
 import kotlinx.coroutines.GlobalScope
@@ -50,7 +53,8 @@ class SettingsActivity : ComponentActivity() {
             val usesHomeSearch = remember { mutableStateOf(false) }
 
             LaunchedEffect(Unit) {
-               usesHomeSearch.value = AppPreferences.readBoolean(this@SettingsActivity, "useSearchTopBar")
+               usesHomeSearch.value =
+                  AppPreferences.readBoolean(this@SettingsActivity, "useSearchTopBar")
             }
 
             Scaffold (
@@ -63,7 +67,9 @@ class SettingsActivity : ComponentActivity() {
                         IconButton(onClick = {
                            navigateUpTo(Intent(this@SettingsActivity, MainActivity::class.java))
                         }) {
-                           Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = getString(R.string.btn_back_desc))
+                           Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = getString(
+                              R.string.btn_back_desc
+                           ))
                         }
                      }
                   )

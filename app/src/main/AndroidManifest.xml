@@ -24,17 +24,17 @@
         </activity>
         
         <activity
-            android:name=".SettingsActivity"
+            android:name=".activities.SettingsActivity"
             android:theme="@style/Theme.Planner"
             android:label="@string/btn_search_desc"/>
 
         <activity
-            android:name=".EditorActivity"
+            android:name=".activities.EditorActivity"
             android:theme="@style/Theme.Planner"
             android:label="@string/activity_create"/>
 
         <activity
-            android:name=".ProjectEditorActivity"
+            android:name=".activities.ProjectEditorActivity"
             android:theme="@style/Theme.Planner"
             android:label="@string/activity_project_create"/>
     </application>
