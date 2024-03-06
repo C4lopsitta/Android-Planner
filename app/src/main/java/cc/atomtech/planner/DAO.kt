@@ -58,18 +58,20 @@ interface ProjectsDAO {
 class Converters {
    @TypeConverter
    fun labelsToDb(labels: ArrayList<String>): String {
-      var csv = ""
+      var json = "["
       for (label in labels) {
-         csv += "$label;"
+         json += "$label,"
       }
-      csv.dropLast(1)
-      return csv
+      json.dropLast(1)
+      json += "]"
+      return json
    }
 
    @TypeConverter
-   fun dbToLabels(labels: String): ArrayList<String> {
+   fun dbToLabels(dbLabelString: String): ArrayList<String> {
       val list = ArrayList<String>()
-      labels.split(";").forEach { string ->
+      val labels = dbLabelString.dropLast(1).drop(1)
+      labels.split(",").forEach { string ->
          list.add(string)
       }
       return list

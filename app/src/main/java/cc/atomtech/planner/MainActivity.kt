@@ -277,7 +277,7 @@ fun ContentController(navController: NavHostController,
       builder = {
          composable(route = "home") {
             isInProject.value = false
-            Dashboard(context = context, reminders = mutableReminders)
+            Dashboard(context = context, reminders = mutableReminders, projects = mutableProjcets)
          }
          composable(route = "labels") {
             isInProject.value = false

@@ -31,6 +31,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import cc.atomtech.planner.Converters
 import cc.atomtech.planner.DB
 import cc.atomtech.planner.activities.EditorActivity
 import cc.atomtech.planner.R
@@ -107,8 +108,9 @@ data class Reminder (
       context?.startActivity(shareIntent)
    }
 
-   fun shareAsJSON(context: Context?) {
-      // TODO)) Add project and labels to JSON
+   fun shareAsJSON(context: Context?, project: Project?) {
+      val converters = Converters()
+
       val intent = Intent().apply {
          action = Intent.ACTION_SEND
          putExtra(Intent.EXTRA_TITLE, context?.getString(R.string.reminder_share_json_title) ?: "")
@@ -122,8 +124,8 @@ data class Reminder (
                   "notifies": ${this@Reminder.notificationDate}
                },
                "id": ${this@Reminder.id},
-               "project": "",
-               "labels": []
+               "project": ${project?.getJSONString() ?: "{}"},
+               "labels": ${converters.labelsToDb(this@Reminder.labels)}
             }
          """.trimIndent());
          type = "text/json"

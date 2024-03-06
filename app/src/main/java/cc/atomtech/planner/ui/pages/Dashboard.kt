@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cc.atomtech.planner.dataEntities.ButtonData
 import cc.atomtech.planner.R
+import cc.atomtech.planner.dataEntities.Project
 import cc.atomtech.planner.dataEntities.Reminder
 import cc.atomtech.planner.dataEntities.ReminderRow
 import cc.atomtech.planner.ui.components.ReminderSheet
@@ -55,7 +56,8 @@ class DashboardCompanion(context: Context?) {
 
 @Composable
 fun Dashboard(context: Context?,
-              reminders: MutableList<Reminder>?) {
+              reminders: MutableList<Reminder>?,
+              projects: MutableList<Project>?) {
    val dashCompanion = DashboardCompanion(context)
    val selectedReminder = remember { mutableStateOf<Reminder?>(null) }
 
@@ -103,8 +105,10 @@ fun Dashboard(context: Context?,
                dismissedReminder.share(context)
             if (dismissAction == ReminderSheet.DismissAction.COPY)
                TODO()
-            if (dismissAction == ReminderSheet.DismissAction.JSON_SHARE)
-               dismissedReminder.shareAsJSON(context)
+            if (dismissAction == ReminderSheet.DismissAction.JSON_SHARE) {
+               val project = projects?.find { it.id == dismissedReminder.projectIdentifier }
+               dismissedReminder.shareAsJSON(context, project)
+            }
          }
       }
 }
@@ -135,7 +139,7 @@ fun IconCard(buttonData: ButtonData) {
 @Composable
 fun DashboardPreview() {
    PlannerTheme {
-      Dashboard(null, null)
+      Dashboard(null, null, null)
    }
 }
 

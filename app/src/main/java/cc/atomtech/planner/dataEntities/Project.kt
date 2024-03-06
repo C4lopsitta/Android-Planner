@@ -65,6 +65,16 @@ data class Project(
          DB.getProjectsDAO()?.delete(this@Project)
       }
    }
+
+   fun getJSONString(): String {
+      return """
+         {
+            "name": "${this@Project.name}",
+            "color": "#${this@Project.color}",
+            "isImportant": ${this@Project.isImportant}
+         }
+      """.trimIndent()
+   }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
