@@ -60,6 +60,7 @@ import cc.atomtech.planner.activities.SettingsActivity
 import cc.atomtech.planner.dataEntities.NavbarItem
 import cc.atomtech.planner.dataEntities.Project
 import cc.atomtech.planner.dataEntities.Reminder
+import cc.atomtech.planner.receivers.AlarmManager
 import cc.atomtech.planner.ui.pages.Dashboard
 import cc.atomtech.planner.ui.pages.Labels
 import cc.atomtech.planner.ui.pages.Projects
@@ -78,6 +79,11 @@ class MainActivity : ComponentActivity() {
    override fun onCreate(savedInstanceState: Bundle?) {
       DB.Connect(context = this@MainActivity, allowDestructiveMigration = true)
 
+      // enable managers
+      AlarmManager.setManager(this@MainActivity)
+
+
+
       CoroutineScope(Dispatchers.Default).launch {
          val isntFirstLaunch = AppPreferences.readBoolean(this@MainActivity, "isntFirstLaunch")
 
@@ -89,9 +95,6 @@ class MainActivity : ComponentActivity() {
          // Create default project (id 1)
          DB.getProjectsDAO()?.create(Project(name = "Default project", color = "ffffff", isImportant = false))
 
-//         val projects = DB.getProjectsDAO()?.readAll()
-
-         //Todo)) Add some default reminders
 
          //TODO)) Launch first installation experience
       }

@@ -35,6 +35,7 @@ import cc.atomtech.planner.DB
 import cc.atomtech.planner.activities.EditorActivity
 import cc.atomtech.planner.R
 import cc.atomtech.planner.Values
+import cc.atomtech.planner.receivers.AlarmManager
 import cc.atomtech.planner.ui.theme.PlannerTheme
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -76,15 +77,21 @@ data class Reminder (
       GlobalScope.launch { DB.getRemindersDAO()!!.update(this@Reminder) }
    }
 
-   fun store() {
+   fun store(context: Context?) {
       GlobalScope.launch { DB.getRemindersDAO()?.create(this@Reminder) }
+
+      if(this.notifies) {
+         AlarmManager.enableReminderNotification(this@Reminder, context)
+      }
    }
 
    fun update() {
+      // TODO)) Add notif updater
       GlobalScope.launch { DB.getRemindersDAO()?.update(this@Reminder) }
    }
 
    fun delete() {
+      // TODO)) Add notif updater
       GlobalScope.launch { DB.getRemindersDAO()?.delete(this@Reminder) }
    }
 

@@ -91,8 +91,10 @@ fun Dashboard(context: Context?,
       ReminderSheet(
          context = context,
          reminder = selectedReminder.value!!
-      ) {
+      ) { deletedReminder ->
          selectedReminder.value = null
+         if(deletedReminder != null)
+            reminders?.remove(deletedReminder)
       }
 }
 

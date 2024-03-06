@@ -24,7 +24,7 @@
     <string name="word_confirm">Confirm</string>
     <string name="word_version">Version</string>
     <string name="lbl_settings_useSearch">Use experimental home search bar</string>
-    <string name="lbl_warn_no_notif">Notification are currently not sent yet</string>
+    <string name="lbl_warn_no_notif">You didn\'t grant permisson to schedule alarms. No notification will be sent.</string>
     <string name="wrong_install_title">You need to reinstall the App</string>
     <string name="wrong_install_body">The app has been installed but the necessary data was not found. Try to reinstall. If this error reappers, please make an Issue on the GitHub page.</string>
     <string name="wrong_install_close">Close app</string>
@@ -48,4 +48,9 @@
     <string name="project_sheet_empty">Delete reminders</string>
     <string name="project_sheet_delete_reminders_confirm_text">You\'re about to delete %1$d reminders inside the project %2$s. This action is unreversable.</string>
     <string name="word_reminders">Reminders</string>
+    <string name="not_yet_implemented">Not yet implemented</string>
+    <string name="reminder_sheet_confirm_confirm">Yes, delete the reminder</string>
+    <string name="reminder_sheet_confirm_dismiss">No, don\'t delete</string>
+    <string name="reminder_sheet_confirm_title">Do you want to delete the reminder?</string>
+    <string name="reminder_sheet_confirm_body">This action cannot be reverted</string>
 </resources>

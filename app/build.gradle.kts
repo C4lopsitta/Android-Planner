@@ -12,8 +12,8 @@ android {
       applicationId = "cc.atomtech.planner"
       minSdk = 26
       targetSdk = 34
-      versionCode = 6
-      versionName = "0.2.3-dev"
+      versionCode = 7
+      versionName = "0.2.4-dev"
 
       testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
       vectorDrawables {

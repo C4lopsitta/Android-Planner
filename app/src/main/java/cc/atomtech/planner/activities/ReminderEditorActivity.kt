@@ -56,6 +56,8 @@ import cc.atomtech.planner.R
 import cc.atomtech.planner.dataEntities.ColorEntity
 import cc.atomtech.planner.dataEntities.Project
 import cc.atomtech.planner.dataEntities.Reminder
+import cc.atomtech.planner.receivers.AlarmManager
+import cc.atomtech.planner.receivers.AlarmReceiver
 import cc.atomtech.planner.ui.components.IconText
 import cc.atomtech.planner.ui.components.SpanningTextField
 import cc.atomtech.planner.ui.components.SwitchRow
@@ -138,7 +140,7 @@ class EditorActivity : ComponentActivity() {
                floatingActionButton = {
                   ExtendedFloatingActionButton(onClick = {
                         if (isCreator.value)
-                           reminder.value.store()
+                           reminder.value.store(context = this@EditorActivity)
                         else
                            reminder.value.update()
                         Log.i("EDITOR", "User triggered store/update, returning")
@@ -237,7 +239,7 @@ fun EditorColumn(context: Context?,
       SwitchRow(value = notifies, onValueChanged = {notifies.value = it; reminder.value.notifies = it}, label = context?.getString(
          R.string.lbl_recieve_notification
       ) ?: "Receive a Notification")
-      if(notifies.value)
+      if(notifies.value && AlarmManager.canSchedule())
          IconText(
             imageVector = Icons.Rounded.Info,
             text = context?.getString(R.string.lbl_warn_no_notif) ?: "",
@@ -343,7 +345,7 @@ fun Column() {
          floatingActionButton = {
             ExtendedFloatingActionButton(onClick = {
                if (isCreator.value)
-                  reminder.value.store()
+                  reminder.value.store(null)
                else
                   reminder.value.update()
                Log.i("EDITOR", "User triggered store/update, returning")
