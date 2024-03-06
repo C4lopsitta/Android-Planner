@@ -14,11 +14,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cc.atomtech.planner.dataEntities.Project
 import cc.atomtech.planner.dataEntities.ProjectRow
+import cc.atomtech.planner.dataEntities.Reminder
 import cc.atomtech.planner.ui.components.ProjectSheet
 import cc.atomtech.planner.ui.theme.PlannerTheme
 
 @Composable
-fun Projects(projects: MutableList<Project>, context: Context?) {
+fun Projects(projects: MutableList<Project>,
+             reminders: MutableList<Reminder>?,
+             context: Context?) {
    val selectedProject = remember { mutableStateOf<Project?>(null) }
 
    Column (
@@ -48,8 +51,10 @@ fun Projects(projects: MutableList<Project>, context: Context?) {
          context = context,
          project = selectedProject.value!!
       ) { deletedProject ->
-         if(deletedProject != null)
+         if(deletedProject != null) {
+            reminders?.removeIf {it.projectIdentifier == deletedProject.id }
             projects.remove(deletedProject)
+         }
          selectedProject.value = null
       }
 }
@@ -58,6 +63,6 @@ fun Projects(projects: MutableList<Project>, context: Context?) {
 @Composable
 fun ProjectsPreview() {
    PlannerTheme {
-      Projects(mutableListOf(), null)
+      Projects(mutableListOf(), null, null)
    }
 }

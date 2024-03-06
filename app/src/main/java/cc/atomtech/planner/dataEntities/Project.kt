@@ -66,6 +66,10 @@ data class Project(
       }
    }
 
+   fun shareToJSON() {
+      TODO()
+   }
+
    fun getJSONString(): String {
       return """
          {
