@@ -91,10 +91,21 @@ fun Dashboard(context: Context?,
       ReminderSheet(
          context = context,
          reminder = selectedReminder.value!!
-      ) { deletedReminder ->
+      ) { dismissedReminder, dismissAction ->
          selectedReminder.value = null
-         if(deletedReminder != null)
-            reminders?.remove(deletedReminder)
+
+         if(dismissedReminder != null) {
+            if (dismissAction == ReminderSheet.DismissAction.DELETE)
+               reminders?.remove(dismissedReminder)
+            if (dismissAction == ReminderSheet.DismissAction.EDIT)
+               TODO()
+            if (dismissAction == ReminderSheet.DismissAction.SHARE)
+               dismissedReminder.share(context)
+            if (dismissAction == ReminderSheet.DismissAction.COPY)
+               TODO()
+            if (dismissAction == ReminderSheet.DismissAction.JSON_SHARE)
+               dismissedReminder.shareAsJSON(context)
+         }
       }
 }
 

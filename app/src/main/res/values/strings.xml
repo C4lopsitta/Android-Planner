@@ -53,4 +53,7 @@
     <string name="reminder_sheet_confirm_dismiss">No, don\'t delete</string>
     <string name="reminder_sheet_confirm_title">Do you want to delete the reminder?</string>
     <string name="reminder_sheet_confirm_body">This action cannot be reverted</string>
+    <string name="reminder_sheet_json_share">Share as JSON</string>
+    <string name="reminder_share_title">Share Reminder</string>
+    <string name="reminder_share_json_title">Share Reminder as JSON</string>
 </resources>

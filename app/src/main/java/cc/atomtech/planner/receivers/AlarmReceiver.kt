@@ -60,7 +60,7 @@ object AlarmManager {
    }
 }
 
-class AlarmReceiver(context: Context) : BroadcastReceiver() {
+class AlarmReceiver() : BroadcastReceiver() {
    override fun onReceive(context: Context?, intent: Intent?) {
       TODO("Not yet implemented")
    }

@@ -95,6 +95,44 @@ data class Reminder (
       GlobalScope.launch { DB.getRemindersDAO()?.delete(this@Reminder) }
    }
 
+   fun share(context: Context?) {
+      val intent = Intent().apply {
+         action = Intent.ACTION_SEND
+         putExtra(Intent.EXTRA_TITLE, context?.getString(R.string.reminder_share_title) ?: "")
+         putExtra(Intent.EXTRA_TEXT, this@Reminder.title)
+         type = "text/plain"
+      }
+
+      val shareIntent = Intent.createChooser(intent, context?.getString(R.string.reminder_share_title) ?: "")
+      context?.startActivity(shareIntent)
+   }
+
+   fun shareAsJSON(context: Context?) {
+      // TODO)) Add project and labels to JSON
+      val intent = Intent().apply {
+         action = Intent.ACTION_SEND
+         putExtra(Intent.EXTRA_TITLE, context?.getString(R.string.reminder_share_json_title) ?: "")
+         putExtra(Intent.EXTRA_TEXT, """
+            {
+               "title": "${this@Reminder.title}",
+               "notifies": ${this@Reminder.notifies.toString()},
+               "timestamps": {
+                  "created": ${this@Reminder.creationDate},
+                  "completed": ${this@Reminder.completionDate},
+                  "notifies": ${this@Reminder.notificationDate}
+               },
+               "id": ${this@Reminder.id},
+               "project": "",
+               "labels": []
+            }
+         """.trimIndent());
+         type = "text/json"
+      }
+
+      val shareIntent = Intent.createChooser(intent, context?.getString(R.string.reminder_share_json_title) ?: "")
+      context?.startActivity(shareIntent)
+   }
+
    fun getBriefTitle(lines: Int = Values.reminderLines, chars: Int = Values.reminderChars): String {
       var body = this.title
       if (body.length > chars) {
@@ -132,7 +170,7 @@ fun ReminderRow(context: Context?, reminder: Reminder, onLongClick: (Reminder) -
    OutlinedCard(
       modifier = Modifier
          .fillMaxWidth()
-         .combinedClickable (
+         .combinedClickable(
             onClick = {
                val intent = Intent(context, EditorActivity::class.java)
                   .putExtra("isCreator", false)

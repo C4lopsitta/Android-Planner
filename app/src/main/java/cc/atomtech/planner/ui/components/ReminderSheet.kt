@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.DataObject
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Share
@@ -29,11 +30,11 @@ import cc.atomtech.planner.dataEntities.Reminder
 //TODO)) Implement better buttons
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReminderSheet(context: Context?, reminder: Reminder, onDismiss: (reminder: Reminder?) -> Unit) {
+fun ReminderSheet(context: Context?, reminder: Reminder, onDismiss: (reminder: Reminder?, action: ReminderSheet.DismissAction) -> Unit) {
    val isDialogOpen = remember { mutableStateOf(false) }
 
    ModalBottomSheet (
-      onDismissRequest = { onDismiss(null) },
+      onDismissRequest = { onDismiss(null, ReminderSheet.DismissAction.NO_ACTION) },
       sheetState = rememberModalBottomSheetState()
    ) {
       TextButton(
@@ -52,13 +53,23 @@ fun ReminderSheet(context: Context?, reminder: Reminder, onDismiss: (reminder: R
       }
 
       TextButton(
-         onClick = { /*TODO*/ },
+         onClick = { onDismiss(reminder, ReminderSheet.DismissAction.SHARE) },
          modifier = Modifier
             .fillMaxWidth()
             .height(64.dp)
       ) {
          Icon(imageVector = Icons.Rounded.Share, contentDescription = null)
          Text(text = context?.getString(R.string.reminder_sheet_share) ?: "")
+      }
+
+      TextButton(
+         onClick = { onDismiss(reminder, ReminderSheet.DismissAction.JSON_SHARE) },
+         modifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp)
+      ) {
+         Icon(imageVector = Icons.Rounded.DataObject, contentDescription = null)
+         Text(text = context?.getString(R.string.reminder_sheet_json_share) ?: "")
       }
 
       TextButton(
@@ -77,9 +88,9 @@ fun ReminderSheet(context: Context?, reminder: Reminder, onDismiss: (reminder: R
          title = context?.getString(R.string.reminder_sheet_confirm_title) ?: "",
          body = context?.getString(R.string.reminder_sheet_confirm_body) ?: "",
          context = context,
-         onDismiss = { onDismiss(null) }) {
+         onDismiss = { onDismiss(null, ReminderSheet.DismissAction.NO_ACTION) }) {
          reminder.delete()
-         onDismiss(reminder)
+         onDismiss(reminder, ReminderSheet.DismissAction.DELETE)
       }
 }
 
@@ -105,5 +116,14 @@ object ReminderSheet {
          title = { Text(text = title) },
          text = { Text(text = body) }
       )
+   }
+
+   enum class DismissAction() {
+      NO_ACTION,
+      DELETE,
+      EDIT,
+      SHARE,
+      COPY,
+      JSON_SHARE
    }
 }
