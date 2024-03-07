@@ -31,13 +31,13 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import cc.atomtech.planner.Converters
 import cc.atomtech.planner.DB
 import cc.atomtech.planner.activities.EditorActivity
 import cc.atomtech.planner.R
 import cc.atomtech.planner.Values
 import cc.atomtech.planner.receivers.AlarmManager
 import cc.atomtech.planner.ui.theme.PlannerTheme
+import com.google.gson.GsonBuilder
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -61,7 +61,7 @@ data class Reminder (
    @ColumnInfo()                    var notificationDate: Long? = null,
    @ColumnInfo()                    var notifies: Boolean = false,
    @ColumnInfo()                    var labels: ArrayList<String> = ArrayList(),
-   @ColumnInfo(index = true)        var projectIdentifier: Long? = 1
+   @ColumnInfo(index = true) @Transient var projectIdentifier: Long? = 1
 ) {
    fun isLate(): Boolean {
       val now: Long = Time.from(Instant.now()).time
@@ -109,25 +109,13 @@ data class Reminder (
    }
 
    fun shareAsJSON(context: Context?, project: Project?) {
-      val converters = Converters()
+      val gson = GsonBuilder().setPrettyPrinting().create()
+      val data = gson.toJson(this)
 
       val intent = Intent().apply {
          action = Intent.ACTION_SEND
          putExtra(Intent.EXTRA_TITLE, context?.getString(R.string.reminder_share_json_title) ?: "")
-         putExtra(Intent.EXTRA_TEXT, """
-            {
-               "title": "${this@Reminder.title}",
-               "notifies": ${this@Reminder.notifies.toString()},
-               "timestamps": {
-                  "created": ${this@Reminder.creationDate},
-                  "completed": ${this@Reminder.completionDate},
-                  "notifies": ${this@Reminder.notificationDate}
-               },
-               "id": ${this@Reminder.id},
-               "project": ${project?.getJSONString() ?: "{}"},
-               "labels": ${converters.labelsToDb(this@Reminder.labels)}
-            }
-         """.trimIndent());
+         putExtra(Intent.EXTRA_TEXT, data);
          type = "text/json"
       }
 
