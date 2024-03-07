@@ -30,6 +30,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import cc.atomtech.planner.DB
 import cc.atomtech.planner.activities.ProjectEditorActivity
+import com.google.gson.GsonBuilder
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -67,17 +68,10 @@ data class Project(
    }
 
    fun shareToJSON() {
-      TODO()
-   }
+      val sharableProject = SharableProject.BuildByProject(this)
+      val data = GsonBuilder().setPrettyPrinting().create().toJson(sharableProject)
 
-   fun getJSONString(): String {
-      return """
-         {
-            "name": "${this@Project.name}",
-            "color": "#${this@Project.color}",
-            "isImportant": ${this@Project.isImportant}
-         }
-      """.trimIndent()
+      TODO("Add share action")
    }
 }
 
@@ -89,7 +83,7 @@ fun ProjectRow(project: Project, context: Context?, onPressHold: (Project) -> Un
    OutlinedCard(
       modifier = Modifier
          .fillMaxWidth()
-         .combinedClickable (
+         .combinedClickable(
             onClick = {
                val intent = Intent(context, ProjectEditorActivity::class.java)
                intent.putExtra("isCreator", false)
@@ -129,4 +123,22 @@ fun ProjectRow(project: Project, context: Context?, onPressHold: (Project) -> Un
    }
 }
 
+
+data class SharableProject(
+   val name: String,
+   val isImportant: Boolean,
+   val color: String,
+   val id: Long,
+   var reminders: List<Reminder> = listOf()
+) {
+   companion object {
+      fun BuildByProject(project: Project): SharableProject {
+         val sharableProject = SharableProject(project.name, project.isImportant, project.color, project.id)
+
+         // TODO)) Get all reminders
+         sharableProject.reminders = listOf()
+         return sharableProject
+      }
+   }
+}
 
