@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -43,6 +44,7 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -55,6 +57,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -77,7 +80,15 @@ import java.time.Instant
 import java.util.Locale
 import java.util.Objects
 
+// TODO)) Componentify column
+
 class EditorActivity : ComponentActivity() {
+   companion object {
+      val DIALOG_CLOSED = 0
+      val DIALOG_CALENDAR = 1
+      val DIALOG_TIME = 2
+   }
+
    lateinit var isCreator: MutableState<Boolean>
    private lateinit var reminder: MutableState<Reminder>
    @OptIn(ExperimentalMaterial3Api::class)
@@ -104,8 +115,8 @@ class EditorActivity : ComponentActivity() {
          PlannerTheme {
             reminder = remember { mutableStateOf(localReminder) }
             isCreator = remember { mutableStateOf(superIntent.getBooleanExtra("isCreator", true)) }
-            val showDatePickerDialog = remember { mutableStateOf(false) }
-            val showTimePickerDialog = remember { mutableStateOf(false) }
+
+            val showDialog = remember { mutableStateOf(EditorActivity.DIALOG_CLOSED) }
             val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
             Scaffold(
@@ -165,11 +176,13 @@ class EditorActivity : ComponentActivity() {
                   )
                },
                content = {
-                  EditorColumn(this@EditorActivity, it, reminder, projectList, showDatePickerDialog)
-                  if(showDatePickerDialog.value) {
+                  EditorColumn(this@EditorActivity, it, reminder, projectList, showDialog = showDialog)
+                  DialogHandler(dialog = showDialog)
+                  //TODO)) Move to handler
+                  if(showDialog.value == EditorActivity.DIALOG_CALENDAR) {
                      DateDialog (
                         onDismissRequest = {selectedDate ->
-                           showDatePickerDialog.value = false
+                           showDialog.value = EditorActivity.DIALOG_CLOSED
                            reminder.value.notificationDate = selectedDate
                         },
                         reminder = reminder.value,
@@ -189,7 +202,7 @@ fun EditorColumn(context: Context?,
                  paddingValues: PaddingValues,
                  reminder: MutableState<Reminder>,
                  projects: MutableList<Project>,
-                 showDialog: MutableState<Boolean>) {
+                 showDialog: MutableState<Int>) {
    val title = remember { mutableStateOf(reminder.value.title) }
    val notifies = remember { mutableStateOf(false) }
    val isProjectDropdownExpanded = remember { mutableStateOf(false) }
@@ -240,7 +253,7 @@ fun EditorColumn(context: Context?,
          }
          IconButton(
             modifier = Modifier.width(32.dp),
-            onClick = { showDialog.value = true },
+            onClick = { showDialog.value = EditorActivity.DIALOG_CALENDAR },
          ) {
             Icon(
                imageVector = Icons.Rounded.Edit,
@@ -261,16 +274,22 @@ fun EditorColumn(context: Context?,
             readOnly = true,
             label = { Text(context?.getString(R.string.word_date) ?: "Date") },
             leadingIcon = { Icon(imageVector = Icons.Rounded.CalendarMonth, contentDescription = null) },
-            modifier = Modifier
-               .fillMaxWidth(0.6F)
-               .combinedClickable( onClick = { showDialog.value = true } )
+            modifier = Modifier.fillMaxWidth(0.5F),
+            singleLine = true,
+            trailingIcon = { IconButton(onClick = { showDialog.value = EditorActivity.DIALOG_CALENDAR }) {
+               Icon(imageVector = Icons.Rounded.Edit, contentDescription = null)
+            }}
          )
          OutlinedTextField(
             value = "",
             onValueChange = {},
             readOnly = true,
+            singleLine = true,
             label = { Text(context?.getString(R.string.word_time) ?: "Time") },
-            leadingIcon = { Icon(imageVector = Icons.Rounded.AccessTime, contentDescription = null) }
+            leadingIcon = { Icon(imageVector = Icons.Rounded.AccessTime, contentDescription = null) },
+            trailingIcon = { IconButton(onClick = { showDialog.value = EditorActivity.DIALOG_TIME }) {
+               Icon(imageVector = Icons.Rounded.Edit, contentDescription = null)
+            }}
          )
       }
 
@@ -347,6 +366,15 @@ fun EditorColumn(context: Context?,
    }
 }
 
+@Composable
+fun DialogHandler(dialog: MutableState<Int>) {
+   if(dialog.value == EditorActivity.DIALOG_CALENDAR)
+      null
+
+   if(dialog.value == EditorActivity.DIALOG_TIME)
+      null
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -375,48 +403,4 @@ fun DateDialog(confirmText: String = "Ok",
 @Composable
 fun TimeDialog() {
 
-}
-
-@Preview()
-@Composable
-fun Column() {
-   PlannerTheme {
-      val reminder = remember { mutableStateOf(Reminder(title = "Lorem ipsum")) }
-      val isCreator = remember { mutableStateOf(false) }
-      val showDatePickerDialog = remember { mutableStateOf(false) }
-      val showTimePickerDialog = remember { mutableStateOf(false) }
-
-      Scaffold(
-         modifier = Modifier.fillMaxSize(),
-
-         floatingActionButton = {
-            ExtendedFloatingActionButton(onClick = {
-               if (isCreator.value)
-                  reminder.value.store(null)
-               else
-                  reminder.value.update()
-               Log.i("EDITOR", "User triggered store/update, returning")
-            },
-               icon = { Icon(
-                  imageVector = if(isCreator.value) Icons.Rounded.Save else Icons.Rounded.Update,
-                  contentDescription = ""
-               ) },
-               text = { Text(text = "Save/Update") }
-            )
-         },
-         content = {
-            EditorColumn(null, it, reminder, mutableListOf(Project(name = "Lorem ipsum", color = "", isImportant = false)), showDatePickerDialog)
-            if(showDatePickerDialog.value) {
-               DateDialog (
-                  onDismissRequest = {selectedDate ->
-                     showDatePickerDialog.value = false
-                     reminder.value.notificationDate = selectedDate
-                  },
-                  reminder = reminder.value,
-                  confirmText = "Confirm"
-               )
-            }
-         }
-      )
-   }
 }
