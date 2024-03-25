@@ -23,9 +23,8 @@ fun SpanningTextField(value: MutableState<String>,
       onValueChange = onValueChanged,
       placeholder = { Text(text = placeholder) },
       label = { Text(text = label) },
-      leadingIcon = { leadingIcon },
-      modifier = Modifier
-         .fillMaxWidth(),
+      leadingIcon = leadingIcon,
+      modifier = Modifier.fillMaxWidth(),
       singleLine = singleLine
    )
 }

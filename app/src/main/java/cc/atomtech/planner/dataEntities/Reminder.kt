@@ -155,7 +155,7 @@ data class Reminder (
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun ReminderRow(context: Context?, reminder: Reminder, onLongClick: (Reminder) -> Unit) {
+fun ReminderCard(context: Context?, reminder: Reminder, onLongClick: (Reminder) -> Unit) {
    val haptics = LocalHapticFeedback.current
    OutlinedCard(
       modifier = Modifier
@@ -207,6 +207,6 @@ fun ReminderRow(context: Context?, reminder: Reminder, onLongClick: (Reminder) -
 fun ReminderRowPreview() {
    val reminder = Reminder(isCompleted = true, title = "Lorem ipsum", notificationDate = Time.from(Instant.now()).time)
    PlannerTheme {
-      ReminderRow(context = null, reminder = reminder) {}
+      ReminderCard(context = null, reminder = reminder) {}
    }
 }

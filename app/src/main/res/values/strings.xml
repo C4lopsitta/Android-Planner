@@ -56,4 +56,6 @@
     <string name="reminder_sheet_json_share">Share as JSON</string>
     <string name="reminder_share_title">Share Reminder</string>
     <string name="reminder_share_json_title">Share Reminder as JSON</string>
+    <string name="word_date">Date</string>
+    <string name="word_time">Time</string>
 </resources>

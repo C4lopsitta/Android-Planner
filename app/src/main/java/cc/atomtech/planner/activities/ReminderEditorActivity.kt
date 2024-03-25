@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,10 +15,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.rounded.AccessTime
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Info
@@ -36,6 +42,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -48,6 +55,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cc.atomtech.planner.DB
@@ -67,6 +75,7 @@ import kotlinx.coroutines.launch
 import java.sql.Time
 import java.time.Instant
 import java.util.Locale
+import java.util.Objects
 
 class EditorActivity : ComponentActivity() {
    lateinit var isCreator: MutableState<Boolean>
@@ -174,7 +183,7 @@ class EditorActivity : ComponentActivity() {
    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun EditorColumn(context: Context?,
                  paddingValues: PaddingValues,
@@ -185,13 +194,15 @@ fun EditorColumn(context: Context?,
    val notifies = remember { mutableStateOf(false) }
    val isProjectDropdownExpanded = remember { mutableStateOf(false) }
 
+
+   //TODO)) Add already selected time
+   val calendar = remember { mutableStateOf(object {
+      var time: Long = 0
+      var date: Long = 0
+   }) }
+
    //TODO)) Fix preselected project
-   val chosenProject = remember { mutableStateOf(projects[0])
-//      if(reminder.value.id == null)
-//         mutableStateOf(projects[0])
-//      else
-//         mutableStateOf(projects[((reminder.value.projectIdentifier ?: 1) - 1).toInt()])
-   }
+   val chosenProject = remember { mutableStateOf(projects[0]) }
 
    Column (
       modifier = Modifier
@@ -208,13 +219,15 @@ fun EditorColumn(context: Context?,
          label = context?.getString(R.string.txt_reminder_title) ?: "",
          leadingIcon = { Icon(imageVector = Icons.Rounded.TextFields, contentDescription = null) }
       )
+
+
+      // Old notification row
       Row(
          modifier = Modifier
             .fillMaxWidth(),
          verticalAlignment = Alignment.CenterVertically,
          horizontalArrangement = Arrangement.spacedBy(12.dp)
-      )
-      {
+      ) {
          Icon(
             imageVector = Icons.Rounded.Notifications,
             contentDescription = context?.getString(R.string.btn_editor_notification_date),
@@ -236,6 +249,31 @@ fun EditorColumn(context: Context?,
          }
       }
 
+      // New notification row
+      Row(
+         modifier = Modifier.fillMaxWidth(),
+         verticalAlignment = Alignment.CenterVertically,
+         horizontalArrangement = Arrangement.spacedBy(12.dp)
+      ) {
+         OutlinedTextField(
+            value = "",
+            onValueChange = {},
+            readOnly = true,
+            label = { Text(context?.getString(R.string.word_date) ?: "Date") },
+            leadingIcon = { Icon(imageVector = Icons.Rounded.CalendarMonth, contentDescription = null) },
+            modifier = Modifier
+               .fillMaxWidth(0.6F)
+               .combinedClickable( onClick = { showDialog.value = true } )
+         )
+         OutlinedTextField(
+            value = "",
+            onValueChange = {},
+            readOnly = true,
+            label = { Text(context?.getString(R.string.word_time) ?: "Time") },
+            leadingIcon = { Icon(imageVector = Icons.Rounded.AccessTime, contentDescription = null) }
+         )
+      }
+
       SwitchRow(value = notifies, onValueChanged = {notifies.value = it; reminder.value.notifies = it}, label = context?.getString(
          R.string.lbl_recieve_notification
       ) ?: "Receive a Notification")
@@ -253,7 +291,7 @@ fun EditorColumn(context: Context?,
          onExpandedChange = {isProjectDropdownExpanded.value = !isProjectDropdownExpanded.value},
          modifier = Modifier.fillMaxWidth()
       ) {
-         TextField(
+         OutlinedTextField(
             value = chosenProject.value.name,
             onValueChange = {},
             readOnly = true,
@@ -312,7 +350,10 @@ fun EditorColumn(context: Context?,
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DateDialog(confirmText: String = "Ok", onDismissRequest: (Long?) -> Unit, reminder: Reminder) {
+fun DateDialog(confirmText: String = "Ok",
+               reminder: Reminder,
+               onDismissRequest: (Long?) -> Unit) {
+
    val now = if(reminder.notificationDate == null) Time.from(Instant.now()).time else reminder.notificationDate
 
    //TODO: Remove hardcoded range
@@ -328,6 +369,12 @@ fun DateDialog(confirmText: String = "Ok", onDismissRequest: (Long?) -> Unit, re
          )
       }
    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TimeDialog() {
+
 }
 
 @Preview()

@@ -1,7 +1,6 @@
 package cc.atomtech.planner.ui.pages
 
 import android.content.Context
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -33,7 +32,7 @@ import cc.atomtech.planner.dataEntities.ButtonData
 import cc.atomtech.planner.R
 import cc.atomtech.planner.dataEntities.Project
 import cc.atomtech.planner.dataEntities.Reminder
-import cc.atomtech.planner.dataEntities.ReminderRow
+import cc.atomtech.planner.dataEntities.ReminderCard
 import cc.atomtech.planner.ui.components.ReminderSheet
 import cc.atomtech.planner.ui.theme.PlannerTheme
 
@@ -84,7 +83,7 @@ fun Dashboard(context: Context?,
          content = {
             items(count = reminders?.size ?: 0, key = null) {
                val item = reminders?.get(it) ?: Reminder()
-               ReminderRow(context = context, reminder = item) { selectedReminder.value = it }
+               ReminderCard(context = context, reminder = item) { selectedReminder.value = it }
             }
          }
       )
