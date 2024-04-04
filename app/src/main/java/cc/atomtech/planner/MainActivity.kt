@@ -6,8 +6,10 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.animation.Animation
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -90,11 +92,12 @@ class MainActivity : ComponentActivity() {
          if(isntFirstLaunch) return@launch
 
          AppPreferences.writeBoolean(this@MainActivity, "isntFirstLaunch", true)
+         AppPreferences.writeString(this@MainActivity, getString(R.string.datastore_last_version), )
+
          Log.i("MAIN_ACTIVITY", "App has been launched for the first time, running setup")
 
          // Create default project (id 1)
          DB.getProjectsDAO()?.create(Project(name = "Default project", color = "ffffff", isImportant = false))
-
 
          //TODO)) Launch first installation experience
       }
@@ -206,7 +209,7 @@ class MainActivity : ComponentActivity() {
                         dismissButton = {
                            Button(
                               onClick = {
-                                 val uri = Uri.parse("https://github.com/c4lopsitta/Android-Planner/issues")
+                                 val uri = Uri.parse(getString(R.string.url_github_issues))
                                  val intent = Intent(Intent.ACTION_VIEW, uri)
                                  startActivity(intent)
                               },

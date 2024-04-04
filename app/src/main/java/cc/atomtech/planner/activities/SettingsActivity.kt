@@ -51,10 +51,13 @@ class SettingsActivity : ComponentActivity() {
             val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
             val usesHomeSearch = remember { mutableStateOf(false) }
+            val showsQuickChips = remember { mutableStateOf(true) }
 
             LaunchedEffect(Unit) {
                usesHomeSearch.value =
                   AppPreferences.readBoolean(this@SettingsActivity, "useSearchTopBar")
+               showsQuickChips.value =
+                  AppPreferences.readBoolean(this@SettingsActivity, getString(R.string.datastore_show_dash_chips))
             }
 
             Scaffold (
@@ -79,6 +82,7 @@ class SettingsActivity : ComponentActivity() {
                   Column (
                      modifier = Modifier
                         .padding(it)
+                        .padding(horizontal = 12.dp, vertical = 16.dp)
                         .fillMaxSize()
                   ) {
                      //TODO: Fix alignment
@@ -92,6 +96,20 @@ class SettingsActivity : ComponentActivity() {
                                  this@SettingsActivity,
                                  "useSearchTopBar",
                                  usesHomeSearch.value
+                              )
+                           }
+                        }
+                     )
+                     SwitchRow(
+                        value = showsQuickChips,
+                        label = getString(R.string.lbl_settings_showChips),
+                        onValueChanged = {
+                           showsQuickChips.value = !showsQuickChips.value
+                           GlobalScope.launch {
+                              AppPreferences.writeBoolean(
+                                 this@SettingsActivity,
+                                 getString(R.string.datastore_show_dash_chips),
+                                 showsQuickChips.value
                               )
                            }
                         }

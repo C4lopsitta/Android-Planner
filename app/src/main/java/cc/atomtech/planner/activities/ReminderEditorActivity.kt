@@ -233,35 +233,6 @@ fun EditorColumn(context: Context?,
          leadingIcon = { Icon(imageVector = Icons.Rounded.TextFields, contentDescription = null) }
       )
 
-
-      // Old notification row
-      Row(
-         modifier = Modifier
-            .fillMaxWidth(),
-         verticalAlignment = Alignment.CenterVertically,
-         horizontalArrangement = Arrangement.spacedBy(12.dp)
-      ) {
-         Icon(
-            imageVector = Icons.Rounded.Notifications,
-            contentDescription = context?.getString(R.string.btn_editor_notification_date),
-            modifier = Modifier.width(32.dp)
-         )
-         Column {
-            Text(text = context?.getString(R.string.btn_editor_notification_date) ?: "Notification date")
-            if(reminder.value.notificationDate != null)
-               Text(text = reminder.value.getBeautifiedNotification() ?: "")
-         }
-         IconButton(
-            modifier = Modifier.width(32.dp),
-            onClick = { showDialog.value = EditorActivity.DIALOG_CALENDAR },
-         ) {
-            Icon(
-               imageVector = Icons.Rounded.Edit,
-               contentDescription = context?.getString(R.string.word_edit)
-            )
-         }
-      }
-
       // New notification row
       Row(
          modifier = Modifier.fillMaxWidth(),
@@ -269,11 +240,11 @@ fun EditorColumn(context: Context?,
          horizontalArrangement = Arrangement.spacedBy(12.dp)
       ) {
          OutlinedTextField(
-            value = "",
+            value = "69/42/6969",
             onValueChange = {},
             readOnly = true,
             label = { Text(context?.getString(R.string.word_date) ?: "Date") },
-            leadingIcon = { Icon(imageVector = Icons.Rounded.CalendarMonth, contentDescription = null) },
+//            leadingIcon = { Icon(imageVector = Icons.Rounded.CalendarMonth, contentDescription = null) },
             modifier = Modifier.fillMaxWidth(0.5F),
             singleLine = true,
             trailingIcon = { IconButton(onClick = { showDialog.value = EditorActivity.DIALOG_CALENDAR }) {
@@ -281,12 +252,12 @@ fun EditorColumn(context: Context?,
             }}
          )
          OutlinedTextField(
-            value = "",
+            value = "42:69",
             onValueChange = {},
             readOnly = true,
             singleLine = true,
             label = { Text(context?.getString(R.string.word_time) ?: "Time") },
-            leadingIcon = { Icon(imageVector = Icons.Rounded.AccessTime, contentDescription = null) },
+//            leadingIcon = { Icon(imageVector = Icons.Rounded.AccessTime, contentDescription = null) },
             trailingIcon = { IconButton(onClick = { showDialog.value = EditorActivity.DIALOG_TIME }) {
                Icon(imageVector = Icons.Rounded.Edit, contentDescription = null)
             }}

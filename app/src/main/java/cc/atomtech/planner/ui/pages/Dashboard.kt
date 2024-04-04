@@ -23,11 +23,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import cc.atomtech.planner.AppPreferences
 import cc.atomtech.planner.dataEntities.ButtonData
 import cc.atomtech.planner.R
 import cc.atomtech.planner.dataEntities.Project
@@ -59,24 +61,33 @@ fun Dashboard(context: Context?,
               projects: MutableList<Project>?) {
    val dashCompanion = DashboardCompanion(context)
    val selectedReminder = remember { mutableStateOf<Reminder?>(null) }
+   val showQuickChips = remember { mutableStateOf(true) }
+
+   LaunchedEffect(Unit) {
+      if(context != null)
+         showQuickChips.value = AppPreferences.readBoolean(context, context.getString(R.string.datastore_show_dash_chips))
+   }
 
    Column (
       modifier = Modifier
          .fillMaxSize()
    ) {
-      LazyVerticalGrid(
-         columns = GridCells.Fixed(2),
-         modifier = Modifier
-            .requiredHeight(200.dp),
-         verticalArrangement = Arrangement.spacedBy(8.dp),
-         horizontalArrangement = Arrangement.spacedBy(8.dp),
-         contentPadding = PaddingValues(12.dp),
-         content = {
-         items(count = dashCompanion.blocks.size, key = null) { index ->
-            val buttonData = dashCompanion.blocks[index]
-            IconCard(buttonData = buttonData)
-         }
-      })
+      if(showQuickChips.value) {
+         LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier
+               .requiredHeight(200.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(12.dp),
+            content = {
+               items(count = dashCompanion.blocks.size, key = null) { index ->
+                  val buttonData = dashCompanion.blocks[index]
+                  IconCard(buttonData = buttonData)
+               }
+            })
+      }
+
       LazyColumn(
          verticalArrangement = Arrangement.spacedBy(8.dp),
          contentPadding = PaddingValues(12.dp),
