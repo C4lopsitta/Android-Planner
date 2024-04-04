@@ -3,9 +3,7 @@
 An application to plan and remind you to do stuff.
 
 ## App Screenshot
-<div>
-    <img alt="A screeenshot of the dashboard of the App" src="https://raw.githubusercontent.com/c4lopsitta/Android-Planner/main/screenshots/phone/dashboard.png?raw=true" height="64rem"/>
-</div>
+<img alt="A screeenshot of the dashboard of the App" src="https://raw.githubusercontent.com/c4lopsitta/Android-Planner/main/screenshots/phone/dashboard.png?raw=true" height="300px" />
 
 ## Features
 - not too bad looking UI
