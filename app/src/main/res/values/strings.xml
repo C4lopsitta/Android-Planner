@@ -64,4 +64,7 @@
     <string name="datastore_show_dash_chips" translatable="false">showsQuickChips</string>
     <string name="datastore_last_version_number" translatable="false">lastVersionNumber</string>
     <string name="nav_labels_calendar">Calendar</string>
+    <string name="nav_labels_search">Search</string>
+    <string name="copyright_notice">© Simone Robaldo 2024</string>
+    <string name="license_notice">This software is licensed under GNU GPLv3 license.</string>
 </resources>

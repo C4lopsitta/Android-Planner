@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -114,7 +115,8 @@ class SettingsActivity : ComponentActivity() {
                            }
                         }
                      )
-                     VersionInfo(this@SettingsActivity)
+
+                     BottomInfo(this@SettingsActivity)
                   }
                }
             )
@@ -124,16 +126,23 @@ class SettingsActivity : ComponentActivity() {
 }
 
 @Composable
-fun VersionInfo(context: Context) {
+fun BottomInfo(context: Context) {
    val versionName = context.packageManager.getPackageInfo(context.packageName, 0).versionName
+   val versionCode = context.packageManager.getPackageInfo(context.packageName, 0).longVersionCode
    Box(
-      modifier = Modifier.height(32.dp),
+      modifier = Modifier.height(128.dp),
       contentAlignment = Alignment.BottomCenter
    ) {
       Text(
-         text = context.getString(R.string.word_version) + " " + versionName,
+         text =
+         """
+            ${context.getString(R.string.copyright_notice)}
+            ${context.getString(R.string.license_notice)}
+            ${context.getString(R.string.word_version)} $versionName ($versionCode)
+         """.trimIndent(),
          textAlign = TextAlign.Center,
          fontSize = TextUnit(2.75f, TextUnitType.Em),
+         lineHeight = TextUnit(1.25f, TextUnitType.Em),
          modifier = Modifier.fillMaxWidth()
       )
    }
