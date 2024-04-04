@@ -3,6 +3,7 @@ package cc.atomtech.planner
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -33,5 +34,18 @@ object AppPreferences {
    suspend fun writeString(context: Context, key: String, string: String) {
       val KEY = stringPreferencesKey(key)
       context.dataStore.edit { it[KEY] = string }
+   }
+
+   suspend fun readInt(context: Context, key: String): Int {
+      val KEY = intPreferencesKey(key)
+      val flow: Flow<Int> = context.dataStore.data.map {
+         it[KEY] ?: 0
+      }
+      return flow.first()
+   }
+
+   suspend fun writeInt(context: Context, key: String, int: Int) {
+      val KEY = intPreferencesKey(key)
+      context.dataStore.edit { it[KEY] = int }
    }
 }

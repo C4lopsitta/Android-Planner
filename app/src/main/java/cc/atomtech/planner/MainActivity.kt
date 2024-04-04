@@ -84,15 +84,23 @@ class MainActivity : ComponentActivity() {
       // enable managers
       AlarmManager.setManager(this@MainActivity)
 
-
-
       CoroutineScope(Dispatchers.Default).launch {
-         val isntFirstLaunch = AppPreferences.readBoolean(this@MainActivity, "isntFirstLaunch")
+         val currentVersionNumber = packageManager.getPackageInfo(packageName, 0).longVersionCode.toInt()
+
+         val isntFirstLaunch = AppPreferences
+            .readBoolean(this@MainActivity, "isntFirstLaunch")
+
+         val lastVersion = AppPreferences
+            .readInt(this@MainActivity, getString(R.string.datastore_last_version_number))
+
+         if(lastVersion == 0 || lastVersion < currentVersionNumber) {
+            AppPreferences.writeInt(this@MainActivity,
+                  getString(R.string.datastore_last_version_number), currentVersionNumber)
+         }
 
          if(isntFirstLaunch) return@launch
 
          AppPreferences.writeBoolean(this@MainActivity, "isntFirstLaunch", true)
-         AppPreferences.writeString(this@MainActivity, getString(R.string.datastore_last_version), )
 
          Log.i("MAIN_ACTIVITY", "App has been launched for the first time, running setup")
 
