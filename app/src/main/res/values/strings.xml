@@ -1,4 +1,70 @@
 <resources>
     <string name="app_name">Planner</string>
-    <string name="fab_add_descriptor">Add</string>
+    <string name="fab_add_label">Add</string>
+    <string name="nav_dashboard_label">Dashboard</string>
+    <string name="nav_projects_label">Projects</string>
+    <string name="nav_labels_label">Labels</string>
+    <string name="dash_card_reminders_label">Reminders</string>
+    <string name="dash_card_due_soon_label">Due soon</string>
+    <string name="dash_card_important_label">Important</string>
+    <string name="dash_card_shared_with_you_label">Shared with you</string>
+    <string name="btn_settings_desc">Settings</string>
+    <string name="btn_search_desc">Search</string>
+    <string name="activity_settings">Settings</string>
+    <string name="btn_back_desc">Back</string>
+    <string name="activity_create">Create</string>
+    <string name="word_reminder">Reminder</string>
+    <string name="txt_reminder_title">Title</string>
+    <string name="fab_save_label">Save</string>
+    <string name="lbl_recieve_notification">Receive a Notification</string>
+    <string name="activity_editor">Edit</string>
+    <string name="btn_editor_notification_date">Notification Date</string>
+    <string name="word_edit">Edit</string>
+    <string name="fab_update_label">Update</string>
+    <string name="word_confirm">Confirm</string>
+    <string name="word_version">Version</string>
+    <string name="lbl_settings_useSearch">Use experimental home search bar</string>
+    <string name="lbl_warn_no_notif">You didn\'t grant permisson to schedule alarms. No notification will be sent.</string>
+    <string name="wrong_install_title">You need to reinstall the App</string>
+    <string name="wrong_install_body">The app has been installed but the necessary data was not found. Try to restart the app first, if this fails reinstall the app. If this error reappers, please make an Issue on the GitHub page.</string>
+    <string name="wrong_install_close">Close app</string>
+    <string name="wrong_install_make_issue">Open GitHub page</string>
+    <string name="activity_project_create" translatable="false">project_create</string>
+    <string name="fab_add_project_label">Create Project</string>
+    <string name="word_project">Project</string>
+    <string name="word_color">Color</string>
+    <string name="project_title">Project Name</string>
+    <string name="long_press_label">More options</string>
+    <string name="reminder_sheet_edit">Edit reminder</string>
+    <string name="reminder_sheet_share">Share reminder</string>
+    <string name="reminder_sheet_delete">Delete reminder</string>
+    <string name="project_sheet_share">Share project</string>
+    <string name="project_sheet_delete">Delete project</string>
+    <string name="project_sheet_edit">Edit project</string>
+    <string name="project_sheet_delete_confirm_title">Are you sure?</string>
+    <string name="project_sheet_delete_confirm_text">You\'re about to delete the project %1$s, which contains %2$d reminders that will also be deleted with the project.</string>
+    <string name="project_sheet_delete_confirm_dismiss_button">No, don\'t delete</string>
+    <string name="project_sheet_delete_confirm_confirm_button">Yes, delete the %1$s</string>
+    <string name="project_sheet_empty">Delete reminders</string>
+    <string name="project_sheet_delete_reminders_confirm_text">You\'re about to delete %1$d reminders inside the project %2$s. This action is unreversable.</string>
+    <string name="word_reminders">Reminders</string>
+    <string name="not_yet_implemented">Not yet implemented</string>
+    <string name="reminder_sheet_confirm_confirm">Yes, delete the reminder</string>
+    <string name="reminder_sheet_confirm_dismiss">No, don\'t delete</string>
+    <string name="reminder_sheet_confirm_title">Do you want to delete the reminder?</string>
+    <string name="reminder_sheet_confirm_body">This action cannot be reverted</string>
+    <string name="reminder_sheet_json_share">Share as JSON</string>
+    <string name="reminder_share_title">Share Reminder</string>
+    <string name="reminder_share_json_title">Share Reminder as JSON</string>
+    <string name="word_date">Date</string>
+    <string name="word_time">Time</string>
+    <string name="date_input_click_label">Open date picker dialog</string>
+    <string name="url_github_issues" translatable="false">https://github.com/c4lopsitta/Android-Planner/issues</string>
+    <string name="lbl_settings_showChips">Show chips in dashboard</string>
+    <string name="datastore_show_dash_chips" translatable="false">showsQuickChips</string>
+    <string name="datastore_last_version_number" translatable="false">lastVersionNumber</string>
+    <string name="nav_labels_calendar">Calendar</string>
+    <string name="nav_labels_search">Search</string>
+    <string name="copyright_notice">© Simone Robaldo 2024</string>
+    <string name="license_notice">This software is licensed under GNU GPLv3 license.</string>
 </resources>

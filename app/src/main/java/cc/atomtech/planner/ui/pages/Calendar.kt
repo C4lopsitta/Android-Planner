@@ -6,14 +6,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import cc.atomtech.planner.ui.theme.PlannerTheme
 
 @Composable
-fun Labels() {
-   Text(text = "Labels UI")
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LabelsPreview() {
-   PlannerTheme {
-      Labels()
-   }
+fun Calendar() {
+   Text(text = "Calendar UI")
 }

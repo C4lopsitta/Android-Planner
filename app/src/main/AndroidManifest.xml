@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:allowBackup="true"
@@ -19,10 +22,44 @@
             android:theme="@style/Theme.Planner">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:theme="@style/Theme.Planner"
+            android:label="@string/btn_search_desc"/>
+
+        <activity
+            android:name=".activities.EditorActivity"
+            android:theme="@style/Theme.Planner"
+            android:label="@string/activity_create"/>
+
+        <activity
+            android:name=".activities.ProjectEditorActivity"
+            android:theme="@style/Theme.Planner"
+            android:label="@string/activity_project_create"/>
+
+        <receiver
+            android:name=".receivers.BootReceiver"
+            android:enabled="false"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".receivers.AlarmReceiver"
+            android:enabled="false"
+            android:exported="false" >
+<!--            <intent-filter>-->
+<!--                <action android:name="" />-->
+<!--            </intent-filter>-->
+        </receiver>
+
     </application>
+
 
 </manifest>
