@@ -63,6 +63,7 @@ import cc.atomtech.planner.dataEntities.NavbarItem
 import cc.atomtech.planner.dataEntities.Project
 import cc.atomtech.planner.dataEntities.Reminder
 import cc.atomtech.planner.receivers.AlarmManager
+import cc.atomtech.planner.ui.pages.Calendar
 import cc.atomtech.planner.ui.pages.Dashboard
 import cc.atomtech.planner.ui.pages.Labels
 import cc.atomtech.planner.ui.pages.Projects
@@ -297,6 +298,10 @@ fun ContentController(navController: NavHostController,
          composable(route = "projects") {
             isInProject.value = true
             Projects(projects = mutableProjcets, reminders = mutableReminders, context = context)
+         }
+         composable(route = "calendar") {
+            isInProject.value = false
+            Calendar()
          }
       }
    )

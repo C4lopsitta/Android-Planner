@@ -63,4 +63,5 @@
     <string name="lbl_settings_showChips">Show chips in dashboard</string>
     <string name="datastore_show_dash_chips" translatable="false">showsQuickChips</string>
     <string name="datastore_last_version_number" translatable="false">lastVersionNumber</string>
+    <string name="nav_labels_calendar">Calendar</string>
 </resources>
